@@ -1,0 +1,20 @@
+# Local development & maintenance tools
+add-track.html
+README.md
+
+# Old local assets (media is on R2 now)
+assets/
+*.png
+*.jpg
+hero.jpg
+
+# Screenshots and notes
+Screenshot*.png
+aether*.png
+covers_folder.png
+
+# Misc
+analysis/
+*.md
+.git/
+node_modules/

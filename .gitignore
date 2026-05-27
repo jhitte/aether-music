@@ -1,0 +1,14 @@
+# Local assets and screenshots (media lives on R2)
+assets/
+*.png
+*.jpg
+
+# Keep these (they are needed)
+!vercel.json
+!tracks.json
+!index.html
+
+# IDE and OS
+.DS_Store
+Thumbs.db
+*.log

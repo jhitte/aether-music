@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aether • Premium AI Music</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Space+Grotesk:wght@500;600&amp;display=swap');
+
+    :root {
+      --bg: #0a0f1c;
+      --card: #111827;
+      --border: #1f2937;
+      --accent: #6366f1;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: 'Inter', system_ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: #e2e8f0;
+      line-height: 1.5;
+    }
+
+    .font-display {
+      font-family: 'Space Grotesk', 'Inter', system_ui, sans-serif;
+      font-weight: 600;
+    }
+
+    .container {
+      max-width: 1480px;
+      margin: 0 auto;
+      padding: 0 32px;
+    }
+
+    /* Navbar */
+    nav {
+      background: #0a0f1c;
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .nav-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 64px;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 24px;
+      font-weight: 700;
+      letter-spacing: -1px;
+    }
+
+    .logo-dot {
+      width: 36px;
+      height: 36px;
+      background: linear-gradient(135deg, #6366f1, #a855f7);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 22px;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 32px;
+    }
+
+    .nav-links a {
+      color: #94a3b8;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .nav-links a:hover, .nav-links a.active {
+      color: white;
+    }
+
+    .nav-links a.active {
+      position: relative;
+    }
+    .nav-links a.active:after {
+      content: '';
+      position: absolute;
+      bottom: -6px;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(to right, #6366f1, #a855f7);
+    }
+
+    .search-bar {
+      background: #111827;
+      border: 1px solid var(--border);
+      border-radius: 9999px;
+      padding: 8px 16px;
+      display: flex;
+      align-items: center;
+      width: 320px;
+    }
+    .search-bar input {
+      background: transparent;
+      border: none;
+      outline: none;
+      color: #e2e8f0;
+      font-size: 14px;
+      flex: 1;
+      margin-left: 10px;
+    }
+
+    /* Hero */
+    .hero {
+      padding: 48px 0 40px;
+      border-bottom: 1px solid var(--border);
+    }
+    .hero h1 {
+      font-size: 52px;
+      line-height: 1.05;
+      font-weight: 700;
+      letter-spacing: -2.5px;
+      margin: 0 0 16px;
+    }
+    .hero p {
+      font-size: 17px;
+      color: #94a3b8;
+      max-width: 420px;
+      margin: 0 0 28px;
+    }
+
+    .btn-primary {
+      background: white;
+      color: #0a0f1c;
+      border: none;
+      padding: 12px 28px;
+      border-radius: 14px;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .btn-primary:hover { background: #f1f5f9; }
+
+    .btn-secondary {
+      background: transparent;
+      color: #e2e8f0;
+      border: 1px solid #334155;
+      padding: 12px 24px;
+      border-radius: 14px;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    .btn-secondary:hover { background: #111827; }
+
+    /* Layout */
+    .main-layout {
+      display: flex;
+      gap: 40px;
+      padding: 40px 0 80px;
+    }
+
+    .sidebar {
+      width: 240px;
+      flex-shrink: 0;
+    }
+    .sidebar-title {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      color: #64748b;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+      padding-left: 4px;
+    }
+
+    .filter-option {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 4px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    .mood-chip {
+      display: inline-block;
+      padding: 6px 14px;
+      background: #111827;
+      border: 1px solid #1f2937;
+      border-radius: 9999px;
+      font-size: 13px;
+      margin: 3px;
+      cursor: pointer;
+    }
+    .mood-chip.active {
+      background: #6366f1;
+      border-color: #6366f1;
+      color: white;
+    }
+
+    .results-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    .results-count {
+      font-size: 20px;
+      font-weight: 600;
+    }
+    .controls {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+    .controls input, .controls select {
+      background: #111827;
+      border: 1px solid #1f2937;
+      color: #e2e8f0;
+      padding: 8px 14px;
+      border-radius: 10px;
+      font-size: 13px;
+      outline: none;
+    }
+    .controls input { width: 260px; }
+
+    /* Music Cards - Now with covers */
+    .music-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 18px;
+    }
+
+    .music-card {
+      background: #111827;
+      border: 1px solid #1f2937;
+      border-radius: 16px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: all 0.2s ease;
+    }
+    .music-card:hover {
+      border-color: #334155;
+      transform: translateY(-2px);
+    }
+
+    .card-cover {
+      height: 180px;
+      background: #0a0f1c;
+      position: relative;
+      cursor: pointer;
+      overflow: hidden;
+    }
+    .card-cover img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.4s ease;
+    }
+    .music-card:hover .card-cover img {
+      transform: scale(1.05);
+    }
+
+    .card-cover .play-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,0.35);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+    .music-card:hover .play-overlay {
+      opacity: 1;
+    }
+    .play-overlay .play-btn {
+      width: 48px;
+      height: 48px;
+      background: white;
+      color: #0a0f1c;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      padding-left: 4px;
+    }
+
+    .card-body {
+      padding: 14px 16px 16px;
+    }
+    .card-title {
+      font-size: 15px;
+      font-weight: 600;
+      line-height: 1.3;
+    }
+    .card-artist {
+      font-size: 13px;
+      color: #64748b;
+      margin-top: 2px;
+    }
+
+    .card-meta {
+      display: flex;
+      gap: 8px;
+      margin: 12px 0 14px;
+    }
+    .tag {
+      background: #1f2937;
+      color: #94a3b8;
+      font-size: 11px;
+      padding: 2px 9px;
+      border-radius: 9999px;
+    }
+
+    .card-actions {
+      display: flex;
+      gap: 8px;
+    }
+    .card-actions button {
+      flex: 1;
+      padding: 9px 0;
+      border-radius: 10px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+    }
+    .btn-play {
+      background: #1f2937;
+      color: #e2e8f0;
+    }
+    .btn-play:hover { background: #334155; }
+    .btn-license {
+      background: white;
+      color: #0a0f1c;
+    }
+    .btn-license:hover { background: #f1f5f9; }
+
+    /* Global Player */
+    .global-player {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: #111827;
+      border-top: 1px solid #1f2937;
+      z-index: 200;
+      display: none;
+    }
+    .player-inner {
+      max-width: 1480px;
+      margin: 0 auto;
+      padding: 0 32px;
+      height: 76px;
+      display: flex;
+      align-items: center;
+      gap: 24px;
+    }
+    .player-info {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      width: 280px;
+    }
+    .progress-container {
+      flex: 1;
+      max-width: 520px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .progress-container input[type="range"] {
+      flex: 1;
+      accent-color: #6366f1;
+    }
+
+    /* Modals */
+    .modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.75);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 300;
+    }
+    .modal-content {
+      background: #111827;
+      border: 1px solid #1f2937;
+      border-radius: 20px;
+      padding: 28px;
+      width: 100%;
+      max-width: 420px;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: #166534;
+      color: white;
+      padding: 14px 22px;
+      border-radius: 12px;
+      font-size: 14px;
+      z-index: 400;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav>
+    <div class="container">
+      <div class="nav-inner">
+        <div class="logo">
+          <div class="logo-dot"><i class="fa-solid fa-infinity"></i></div>
+          <span class="font-display">Aether</span>
+        </div>
+
+        <div class="nav-links">
+          <a href="#" class="active">Browse</a>
+          <a href="#" onclick="showPricing()">Pricing</a>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 14px;">
+          <div class="search-bar">
+            <i class="fa-solid fa-search" style="color:#64748b"></i>
+            <input id="nav-search" placeholder="Search tracks..." onkeyup="if (event.key === 'Enter') quickSearch()">
+          </div>
+
+          <div onclick="showLoginModal()" style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+            <div style="width:32px; height:32px; border-radius:50%; overflow:hidden; border:1px solid #334155;">
+              <img src="https://i.pravatar.cc/32?img=47" style="width:100%; height:100%; object-fit:cover;">
+            </div>
+            <span style="font-size:14px; font-weight:500;">Alex Rivera <span style="background:#10b981; color:white; font-size:9px; padding:1px 5px; border-radius:4px; font-weight:700;">PRO</span></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <div class="container">
+    <div class="hero">
+      <h1>Premium AI Music.<br>Licensed in Seconds.</h1>
+      <p>High-quality AI-generated tracks with instant commercial licenses.</p>
+      
+      <div style="display:flex; gap:12px;">
+        <button onclick="document.getElementById('main-search').focus()" class="btn-primary">Browse tracks</button>
+        <button onclick="showPricing()" class="btn-secondary">View licensing plans</button>
+      </div>
+
+      <div style="margin-top:24px; display:flex; align-items:center; gap:12px; font-size:13px; color:#64748b;">
+        <div style="display:flex; margin-right:6px;">
+          <img src="https://i.pravatar.cc/22?img=28" style="width:22px; height:22px; border-radius:50%; border:2px solid #0a0f1c;">
+          <img src="https://i.pravatar.cc/22?img=32" style="width:22px; height:22px; border-radius:50%; border:2px solid #0a0f1c; margin-left:-6px;">
+          <img src="https://i.pravatar.cc/22?img=47" style="width:22px; height:22px; border-radius:50%; border:2px solid #0a0f1c; margin-left:-6px;">
+        </div>
+        <span>Used by <strong style="color:#e2e8f0;">47,892</strong> creators worldwide</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="container">
+    <div class="main-layout">
+
+      <!-- Sidebar -->
+      <div class="sidebar">
+        <div style="margin-bottom:28px;">
+          <div class="sidebar-title">Genre</div>
+          <div id="filter-genres"></div>
+        </div>
+
+        <div>
+          <div class="sidebar-title">Mood</div>
+          <div id="filter-moods" style="display:flex; flex-wrap:wrap; gap:6px;"></div>
+        </div>
+      </div>
+
+      <!-- Results -->
+      <div style="flex:1; min-width:0;">
+        <div class="results-header">
+          <div>
+            <span id="results-count" class="results-count">Loading tracks...</span>
+          </div>
+          <div class="controls">
+            <input id="main-search" type="text" placeholder="Search title or mood..." oninput="applyFilters()">
+            <select id="sort-select" onchange="applyFilters()">
+              <option value="popular">Most popular</option>
+              <option value="newest">Newest first</option>
+              <option value="duration-asc">Shortest first</option>
+              <option value="duration-desc">Longest first</option>
+            </select>
+          </div>
+        </div>
+
+        <div id="tracks-grid" class="music-grid"></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Global Player -->
+  <div id="global-player" class="global-player">
+    <div class="player-inner">
+      <div class="player-info">
+        <div onclick="togglePlay()" style="width:42px; height:42px; background:#1f2937; border-radius:10px; display:flex; align-items:center; justify-content:center; cursor:pointer;">
+          <i id="player-play-icon" class="fa-solid fa-play" style="margin-left:2px;"></i>
+        </div>
+        <div>
+          <div id="player-title" style="font-weight:600; font-size:14px;"></div>
+          <div id="player-artist" style="font-size:12px; color:#64748b;"></div>
+        </div>
+      </div>
+
+      <div class="progress-container">
+        <span id="player-current-time" style="font-size:12px; color:#64748b; width:36px; text-align:right;">0:00</span>
+        <input type="range" id="player-progress" min="0" max="100" value="0" oninput="seekAudio()">
+        <span id="player-duration" style="font-size:12px; color:#64748b; width:36px;">3:12</span>
+      </div>
+
+      <div style="display:flex; align-items:center; gap:18px; margin-left:auto;">
+        <button onclick="togglePlay()" style="background:none; border:none; color:white; font-size:20px; cursor:pointer;"><i id="player-main-play" class="fa-solid fa-play"></i></button>
+        <div style="display:flex; align-items:center; gap:8px; width:110px;">
+          <i class="fa-solid fa-volume-low" style="color:#64748b;"></i>
+          <input type="range" id="player-volume" min="0" max="100" value="80" oninput="setVolume()">
+        </div>
+        <button onclick="downloadCurrentTrack()" class="btn-secondary" style="padding:6px 14px; font-size:12px;">License &amp; Download</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- License Modal -->
+  <div id="download-modal" class="modal" onclick="if (event.target.id === 'download-modal') hideDownloadModal()">
+    <div class="modal-content" onclick="event.stopImmediatePropagation()">
+      <div style="display:flex; justify-content:space-between; margin-bottom:20px;">
+        <div>
+          <div style="font-weight:600;">Get License</div>
+          <div id="modal-track-title" style="font-size:13px; color:#64748b;"></div>
+        </div>
+        <span onclick="hideDownloadModal()" style="font-size:26px; cursor:pointer; color:#64748b;">&times;</span>
+      </div>
+
+      <div id="license-options" style="margin-bottom:20px;"></div>
+
+      <div style="display:flex; justify-content:space-between; border-top:1px solid #1f2937; padding-top:16px;">
+        <div>Total</div>
+        <div id="modal-total-price" style="font-size:20px; font-weight:700;">$29</div>
+      </div>
+
+      <button onclick="completePurchase()" style="width:100%; margin-top:20px; height:46px; background:white; color:#0a0f1c; border:none; border-radius:12px; font-weight:700; cursor:pointer;">
+        Purchase &amp; Download
+      </button>
+    </div>
+  </div>
+
+  <div id="toast-container" style="position:fixed; bottom:20px; right:20px; z-index:500;"></div>
+
+  <script>
+    // ==================== STATE ====================
+    let allTracks = [];
+    let filteredTracks = [];
+    let currentAudio = null;
+    let currentTrackId = null;
+    let favorites = new Set();
+
+    // ==================== LOAD TRACKS FROM JSON ====================
+    async function loadTracks() {
+      try {
+        const res = await fetch('tracks.json');
+        const data = await res.json();
+        allTracks = data.tracks || [];
+        filteredTracks = [...allTracks];
+        renderFilters();
+        renderTracks();
+        document.getElementById('results-count').textContent = `${allTracks.length.toLocaleString()} tracks`;
+      } catch (e) {
+        console.error("Failed to load tracks.json", e);
+        document.getElementById('results-count').textContent = "Failed to load tracks";
+      }
+    }
+
+    // ==================== FILTERS ====================
+    function renderFilters() {
+      const genres = [...new Set(allTracks.map(t => t.genre))];
+      const moods = [...new Set(allTracks.map(t => t.mood))];
+
+      const genreEl = document.getElementById('filter-genres');
+      genreEl.innerHTML = genres.map(g => `
+        <label class="filter-option">
+          <input type="checkbox" value="${g}" onchange="applyFilters()" style="accent-color:#6366f1">
+          <span>${g}</span>
+        </label>
+      `).join('');
+
+      const moodEl = document.getElementById('filter-moods');
+      moodEl.innerHTML = moods.map(m => `
+        <div onclick="toggleMoodFilter(this)" class="mood-chip">${m}</div>
+      `).join('');
+    }
+
+    function toggleMoodFilter(el) {
+      el.classList.toggle('active');
+      applyFilters();
+    }
+
+    function applyFilters() {
+      const search = document.getElementById('main-search').value.toLowerCase().trim();
+      const sort = document.getElementById('sort-select').value;
+
+      const activeGenres = Array.from(document.querySelectorAll('#filter-genres input:checked')).map(cb => cb.value);
+      const activeMoods = Array.from(document.querySelectorAll('#filter-moods .mood-chip.active')).map(el => el.textContent.trim());
+
+      filteredTracks = allTracks.filter(t => {
+        const hay = `${t.title} ${t.artist} ${t.genre} ${t.mood}`.toLowerCase();
+        if (search && !hay.includes(search)) return false;
+        if (activeGenres.length && !activeGenres.includes(t.genre)) return false;
+        if (activeMoods.length && !activeMoods.includes(t.mood)) return false;
+        return true;
+      });
+
+      if (sort === 'popular') filteredTracks.sort((a,b) => b.plays - a.plays);
+      else if (sort === 'newest') filteredTracks.sort((a,b) => new Date(b.created) - new Date(a.created));
+      else if (sort === 'duration-asc') filteredTracks.sort((a,b) => parseDuration(a.duration) - parseDuration(b.duration));
+      else if (sort === 'duration-desc') filteredTracks.sort((a,b) => parseDuration(b.duration) - parseDuration(a.duration));
+
+      renderTracks();
+    }
+
+    function parseDuration(dur) {
+      const [m, s] = dur.split(':').map(Number);
+      return (m * 60) + s;
+    }
+
+    function quickSearch() {
+      document.getElementById('main-search').value = document.getElementById('nav-search').value;
+      applyFilters();
+    }
+
+    // ==================== RENDER TRACKS (with covers) ====================
+    function renderTracks() {
+      const grid = document.getElementById('tracks-grid');
+      const countEl = document.getElementById('results-count');
+      countEl.textContent = `${filteredTracks.length.toLocaleString()} tracks`;
+
+      grid.innerHTML = '';
+
+      filteredTracks.forEach(track => {
+        const card = document.createElement('div');
+        card.className = 'music-card';
+
+        const hasCover = track.cover && track.cover.trim() !== '';
+
+        card.innerHTML = `
+          <div class="card-cover" onclick="playTrack(${track.id})">
+            ${hasCover 
+              ? `<img src="${track.cover}" alt="${track.title}">` 
+              : `<div style="width:100%;height:100%;background:#0a0f1c;display:flex;align-items:center;justify-content:center;color:#475569;"><i class="fa-solid fa-music" style="font-size:42px;opacity:0.4"></i></div>`
+            }
+            <div class="play-overlay">
+              <div class="play-btn"><i class="fa-solid fa-play"></i></div>
+            </div>
+            <div style="position:absolute;bottom:8px;right:8px;font-size:10px;font-family:monospace;background:rgba(0,0,0,0.6);padding:1px 6px;border-radius:4px;">
+              ${track.duration}
+            </div>
+          </div>
+
+          <div class="card-body">
+            <div class="card-title">${track.title}</div>
+            <div class="card-artist">${track.artist}</div>
+
+            <div class="card-meta">
+              <span class="tag">${track.genre}${track.subgenres ? ' / ' + track.subgenres.join(' / ') : ''}</span>
+              <span style="color:#64748b;font-size:12px;">${track.bpm} BPM</span>
+            </div>
+
+            ${track.mood ? `
+            <div style="margin-bottom:10px; font-size:11px; color:#94a3b8; line-height:1.3;">
+              ${Array.isArray(track.mood) ? track.mood.join(' • ') : track.mood}
+            </div>` : ''}
+
+            ${track.aiGenerated ? `<div style="font-size:10px; color:#6366f1; font-weight:600; margin-bottom:8px;">AI GENERATED</div>` : ''}
+
+            <div class="card-actions">
+              <button class="btn-play" onclick="event.stopImmediatePropagation(); playTrack(${track.id})">Preview</button>
+              <button class="btn-license" onclick="event.stopImmediatePropagation(); showDownloadModal(${track.id})">License</button>
+            </div>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    // ==================== PLAYER ====================
+    function playTrack(id) {
+      const track = allTracks.find(t => t.id === id);
+      if (!track) return;
+
+      const player = document.getElementById('global-player');
+      player.style.display = 'block';
+
+      document.getElementById('player-title').textContent = track.title;
+      document.getElementById('player-artist').textContent = track.artist;
+
+      if (currentAudio) currentAudio.pause();
+
+      currentTrackId = id;
+      currentAudio = new Audio(track.audio);
+      currentAudio.volume = parseInt(document.getElementById('player-volume').value) / 100;
+
+      currentAudio.ontimeupdate = updatePlayerProgress;
+      currentAudio.onended = () => {
+        document.getElementById('player-play-icon').classList.replace('fa-pause', 'fa-play');
+        document.getElementById('player-main-play').classList.replace('fa-pause', 'fa-play');
+      };
+
+      currentAudio.play().catch(() => {
+        showToast("Could not play audio. Make sure the file exists.");
+      });
+
+      document.getElementById('player-play-icon').classList.replace('fa-play', 'fa-pause');
+      document.getElementById('player-main-play').classList.replace('fa-play', 'fa-pause');
+    }
+
+    function updatePlayerProgress() {
+      if (!currentAudio) return;
+      const percent = (currentAudio.currentTime / currentAudio.duration) * 100 || 0;
+      document.getElementById('player-progress').value = percent;
+
+      const mins = Math.floor(currentAudio.currentTime / 60);
+      const secs = Math.floor(currentAudio.currentTime % 60);
+      document.getElementById('player-current-time').textContent = `${mins}:${secs.toString().padStart(2,'0')}`;
+    }
+
+    function seekAudio() {
+      if (!currentAudio) return;
+      const val = document.getElementById('player-progress').value;
+      currentAudio.currentTime = (val / 100) * currentAudio.duration;
+    }
+
+    function togglePlay() {
+      if (!currentAudio) return;
+      const icon = document.getElementById('player-play-icon');
+      const main = document.getElementById('player-main-play');
+
+      if (currentAudio.paused) {
+        currentAudio.play();
+        icon.classList.replace('fa-play', 'fa-pause');
+        main.classList.replace('fa-play', 'fa-pause');
+      } else {
+        currentAudio.pause();
+        icon.classList.replace('fa-pause', 'fa-play');
+        main.classList.replace('fa-pause', 'fa-play');
+      }
+    }
+
+    function setVolume() {
+      if (currentAudio) currentAudio.volume = parseInt(document.getElementById('player-volume').value) / 100;
+    }
+
+    function downloadCurrentTrack() {
+      if (currentTrackId) showDownloadModal(currentTrackId);
+    }
+
+    // ==================== LICENSE MODAL ====================
+    let selectedTrack = null;
+
+    function showDownloadModal(id) {
+      selectedTrack = allTracks.find(t => t.id === id);
+      if (!selectedTrack) return;
+
+      document.getElementById('modal-track-title').innerHTML = 
+        `${selectedTrack.title} <span style="font-size:12px">• ${selectedTrack.duration}</span>`;
+
+      const opts = document.getElementById('license-options');
+      opts.innerHTML = `
+        <div onclick="updatePrice(${selectedTrack.price - 10})" style="display:flex;justify-content:space-between;border:1px solid #1f2937;padding:12px 16px;border-radius:12px;margin-bottom:8px;cursor:pointer;">
+          <div>Personal / Indie Use</div><div style="font-weight:600;">$${selectedTrack.price - 10}</div>
+        </div>
+        <div onclick="updatePrice(${selectedTrack.price})" style="display:flex;justify-content:space-between;border:1px solid #6366f1;background:#1e2937;padding:12px 16px;border-radius:12px;cursor:pointer;">
+          <div>Commercial License</div><div style="font-weight:600;">$${selectedTrack.price}</div>
+        </div>
+      `;
+
+      document.getElementById('download-modal').style.display = 'flex';
+      updatePrice(selectedTrack.price);
+    }
+
+    function updatePrice(price) {
+      document.getElementById('modal-total-price').textContent = '$' + price;
+    }
+
+    function hideDownloadModal() {
+      document.getElementById('download-modal').style.display = 'none';
+    }
+
+    function completePurchase() {
+      hideDownloadModal();
+      showToast('Purchase successful! License sent to your email.');
+
+      if (selectedTrack) {
+        const link = document.createElement('a');
+        link.href = selectedTrack.audio;
+        link.download = selectedTrack.title + '.mp3';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }
+    }
+
+    // ==================== MISC ====================
+    function showPricing() {
+      alert("Pricing plans coming soon. For now, individual licenses are available per track.");
+    }
+
+    function showLoginModal() {
+      const modal = document.createElement('div');
+      modal.className = 'modal';
+      modal.style.display = 'flex';
+      modal.innerHTML = `
+        <div class="modal-content" style="max-width:360px;">
+          <div style="font-size:20px; font-weight:600; margin-bottom:20px;">Sign in</div>
+          <input type="email" value="you@studio.com" style="width:100%; background:#0a0f1c; border:1px solid #1f2937; padding:12px; border-radius:10px; margin-bottom:10px; color:#e2e8f0;">
+          <input type="password" value="demo123" style="width:100%; background:#0a0f1c; border:1px solid #1f2937; padding:12px; border-radius:10px; margin-bottom:20px; color:#e2e8f0;">
+          <button onclick="this.closest('.modal').remove(); showToast('Signed in successfully.')" style="width:100%; height:46px; background:white; color:#0a0f1c; border:none; border-radius:12px; font-weight:700;">Sign In</button>
+        </div>
+      `;
+      document.body.appendChild(modal);
+    }
+
+    function showToast(msg) {
+      const c = document.getElementById('toast-container');
+      const t = document.createElement('div');
+      t.className = 'toast';
+      t.textContent = msg;
+      c.appendChild(t);
+      setTimeout(() => t.remove(), 3400);
+    }
+
+    // ==================== INIT ====================
+    function init() {
+      document.getElementById('sort-select').value = 'popular';
+      loadTracks();
+
+      // Keyboard shortcut
+      document.addEventListener('keydown', e => {
+        if (e.key === '/' && document.activeElement.tagName === 'BODY') {
+          e.preventDefault();
+          document.getElementById('main-search').focus();
+        }
+      });
+
+      console.log('%c[Aether] Ready. Tracks loaded from tracks.json', 'color:#64748b');
+    }
+
+    window.onload = init;
+  </script>
+</body>
+</html>

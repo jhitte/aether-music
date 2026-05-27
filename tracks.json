@@ -1,0 +1,40 @@
+{
+  "tracks": [
+    {
+      "id": 1,
+      "title": "Angela (Open Up Your Heart)",
+      "artist": "Jeffrey Hitte",
+      "duration": "4:12",
+      "bpm": 72,
+      "genre": "Blues",
+      "subgenres": ["Slow Blues", "Soul Blues"],
+      "mood": ["Emotional", "Longing", "Heartfelt", "Pleading"],
+      "price": 0.99,
+      "audio": "https://pub-d36e4f8ccd12409cb5f92373630441e1.r2.dev/audio/angela_open_up_your_heart.mp3",
+      "cover": "https://pub-d36e4f8ccd12409cb5f92373630441e1.r2.dev/covers/angela_open_up_your_heart.jpg",
+      "plays": 0,
+      "downloads": 0,
+      "isNew": true,
+      "aiGenerated": true,
+      "created": "2026-05-27"
+    },
+    {
+      "id": 2,
+      "title": "She Believed in Me",
+      "artist": "Jeffrey Hitte",
+      "duration": "4:45",
+      "bpm": 68,
+      "genre": "Country",
+      "subgenres": ["Contemporary Country", "Power Ballad"],
+      "mood": ["Heartfelt", "Emotional", "Uplifting", "Redemptive", "Powerful"],
+      "price": 0.99,
+      "audio": "https://pub-d36e4f8ccd12409cb5f92373630441e1.r2.dev/audio/she_believed_in_me.mp3",
+      "cover": "https://pub-d36e4f8ccd12409cb5f92373630441e1.r2.dev/covers/she_believed_in_me.jpg",
+      "plays": 0,
+      "downloads": 0,
+      "isNew": true,
+      "aiGenerated": true,
+      "created": "2026-05-27"
+    }
+  ]
+}
