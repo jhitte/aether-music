@@ -407,7 +407,7 @@
       border-radius: 20px;
       padding: 28px;
       width: 100%;
-      max-width: 420px;
+      max-width: 520px;
     }
 
     .toast {
@@ -550,25 +550,62 @@
 
   <!-- License Modal -->
   <div id="download-modal" class="modal" onclick="if (event.target.id === 'download-modal') hideDownloadModal()">
-    <div class="modal-content" onclick="event.stopImmediatePropagation()">
-      <div style="display:flex; justify-content:space-between; margin-bottom:20px;">
+    <div class="modal-content" onclick="event.stopImmediatePropagation()" style="max-width: 520px; width: 100%;">
+      <!-- Header -->
+      <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:20px;">
         <div>
-          <div style="font-weight:600;">Get License</div>
-          <div id="modal-track-title" style="font-size:13px; color:#64748b;"></div>
+          <div style="font-weight:700; font-size:18px;">Choose Your License</div>
+          <div id="modal-track-title" style="font-size:14px; color:#64748b; margin-top:4px;"></div>
         </div>
-        <span onclick="hideDownloadModal()" style="font-size:26px; cursor:pointer; color:#64748b;">&times;</span>
+        <span onclick="hideDownloadModal()" style="font-size:28px; cursor:pointer; color:#64748b; line-height:1;">&times;</span>
       </div>
 
-      <div id="license-options" style="margin-bottom:20px;"></div>
+      <!-- License Tiers -->
+      <div id="license-options" style="display:flex; flex-direction:column; gap:10px; margin-bottom:20px;"></div>
 
-      <div style="display:flex; justify-content:space-between; border-top:1px solid #1f2937; padding-top:16px;">
-        <div>Total</div>
-        <div id="modal-total-price" style="font-size:20px; font-weight:700;">$29</div>
+      <!-- PayPal Container -->
+      <div id="paypal-container" style="margin-top:12px; min-height: 50px;"></div>
+
+      <!-- Selected Summary -->
+      <div id="license-summary" style="display:none; margin-top:16px; padding-top:16px; border-top:1px solid #1f2937; font-size:13px;">
+        <div style="display:flex; justify-content:space-between; color:#94a3b8;">
+          <div id="summary-tier"></div>
+          <div id="summary-price" style="font-weight:600; color:white;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Post-Purchase Success Modal -->
+  <div id="success-modal" class="modal" onclick="if (event.target.id === 'success-modal') hideSuccessModal()">
+    <div class="modal-content" onclick="event.stopImmediatePropagation()" style="max-width: 480px;">
+      <div style="text-align:center; margin-bottom:20px;">
+        <div style="width:64px; height:64px; background:#166534; border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 16px;">
+          <i class="fa-solid fa-check" style="font-size:32px; color:#4ade80;"></i>
+        </div>
+        <div style="font-size:22px; font-weight:700; margin-bottom:6px;">Thank You!</div>
+        <div style="color:#64748b;">Your payment was successful.</div>
       </div>
 
-      <button onclick="completePurchase()" style="width:100%; margin-top:20px; height:46px; background:white; color:#0a0f1c; border:none; border-radius:12px; font-weight:700; cursor:pointer;">
-        Purchase &amp; Download
-      </button>
+      <div id="success-details" style="background:#0a0f1c; border:1px solid #1f2937; border-radius:12px; padding:16px; margin-bottom:20px; font-size:13px;">
+        <!-- Populated by JS -->
+      </div>
+
+      <div style="display:flex; gap:10px;">
+        <button onclick="downloadPurchasedTrack()" style="flex:1; height:46px; background:white; color:#0a0f1c; border:none; border-radius:12px; font-weight:700; cursor:pointer;">
+          <i class="fa-solid fa-download"></i> Download MP3
+        </button>
+        <button onclick="hideSuccessModal()" style="flex:1; height:46px; background:transparent; color:#e2e8f0; border:1px solid #334155; border-radius:12px; font-weight:600;">
+          Close
+        </button>
+      </div>
+
+      <!-- Fallback link removed to prevent re-use without fresh payment -->
+
+      <div style="margin-top:12px; font-size:11px; color:#64748b; text-align:center; line-height:1.4;">
+        A receipt was sent to your PayPal email.<br>
+        If the download doesn't start, click the button above again.
+      </div>
     </div>
   </div>
 
@@ -581,6 +618,13 @@
     let currentAudio = null;
     let currentTrackId = null;
     let favorites = new Set();
+
+    // ==================== PAYPAL CONFIG ====================
+    // TODO: Replace this with your real PayPal Client ID (from https://developer.paypal.com)
+    // Start with Sandbox for testing, then switch to Live when ready.
+    const PAYPAL_CLIENT_ID = 'AR-rcs3slY8J438RUooogLyIvEu0KqlCZ-OAMfhQ25OS-eYXmm6YLmDT5r_mJNXF5i9DCquUjLTcUhsO';   // Sandbox Client ID
+    let paypalLoaded = false;
+    let selectedLicense = null;   // { tier, price, name, track }
 
     // ==================== LOAD TRACKS FROM JSON ====================
     async function loadTracks() {
@@ -780,50 +824,245 @@
       if (currentTrackId) showDownloadModal(currentTrackId);
     }
 
-    // ==================== LICENSE MODAL ====================
+    // ==================== LICENSE MODAL + PAYPAL ====================
     let selectedTrack = null;
+
+    const LICENSE_TIERS = [
+      {
+        id: 'personal',
+        name: 'Personal License',
+        price: 0.99,
+        description: 'Personal projects, YouTube (monetized OK), social media, podcasts',
+        features: 'Non-commercial + small monetized use'
+      },
+      {
+        id: 'commercial',
+        name: 'Commercial License',
+        price: 4.99,
+        description: 'Business use, client projects, apps, websites, ads under $10k budget',
+        features: 'Full commercial rights + client work'
+      },
+      {
+        id: 'broadcast',
+        name: 'Broadcast & Sync License',
+        price: 19.99,
+        description: 'TV, film, radio, large advertising campaigns, sync placements',
+        features: 'Unlimited distribution + sync rights'
+      }
+    ];
 
     function showDownloadModal(id) {
       selectedTrack = allTracks.find(t => t.id === id);
       if (!selectedTrack) return;
 
       document.getElementById('modal-track-title').innerHTML = 
-        `${selectedTrack.title} <span style="font-size:12px">• ${selectedTrack.duration}</span>`;
+        `${selectedTrack.title} <span style="font-size:12px; color:#64748b;">• ${selectedTrack.duration}</span>`;
 
       const opts = document.getElementById('license-options');
-      opts.innerHTML = `
-        <div onclick="updatePrice(${selectedTrack.price - 10})" style="display:flex;justify-content:space-between;border:1px solid #1f2937;padding:12px 16px;border-radius:12px;margin-bottom:8px;cursor:pointer;">
-          <div>Personal / Indie Use</div><div style="font-weight:600;">$${selectedTrack.price - 10}</div>
+      opts.innerHTML = '';
+
+      LICENSE_TIERS.forEach(tier => {
+        const div = document.createElement('div');
+        div.style.cssText = 'border:1px solid #1f2937; padding:14px 16px; border-radius:12px; cursor:pointer; transition:all .2s ease;';
+        div.innerHTML = `
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <div>
+              <div style="font-weight:600; font-size:15px;">${tier.name}</div>
+              <div style="font-size:12px; color:#64748b; margin-top:2px;">${tier.description}</div>
+            </div>
+            <div style="text-align:right; font-weight:700; font-size:16px; min-width:64px;">$${tier.price}</div>
+          </div>
+        `;
+        div.onclick = () => selectLicenseTier(tier, div);
+        opts.appendChild(div);
+      });
+
+      // Reset PayPal area
+      document.getElementById('paypal-container').innerHTML = '';
+      document.getElementById('license-summary').style.display = 'none';
+      selectedLicense = null;
+
+      document.getElementById('download-modal').style.display = 'flex';
+    }
+
+    function selectLicenseTier(tier, element) {
+      // Deselect all
+      document.querySelectorAll('#license-options > div').forEach(el => {
+        el.style.border = '1px solid #1f2937';
+        el.style.background = 'transparent';
+      });
+
+      // Highlight selected
+      element.style.border = '1px solid #6366f1';
+      element.style.background = '#1e2937';
+
+      selectedLicense = {
+        tier: tier.id,
+        price: tier.price,
+        name: tier.name,
+        description: tier.features,
+        track: selectedTrack
+      };
+
+      // Show summary
+      const summary = document.getElementById('license-summary');
+      summary.style.display = 'block';
+      document.getElementById('summary-tier').textContent = tier.name;
+      document.getElementById('summary-price').textContent = '$' + tier.price.toFixed(2);
+
+      // Render PayPal button
+      renderPayPalButton();
+    }
+
+    function renderPayPalButton() {
+      const container = document.getElementById('paypal-container');
+      container.innerHTML = '<div style="text-align:center; color:#64748b; font-size:12px; padding:8px;">Loading PayPal...</div>';
+
+      // Load PayPal SDK if not already loaded
+      if (!paypalLoaded && !PAYPAL_CLIENT_ID.includes('YOUR_PAYPAL_CLIENT_ID')) {
+        const script = document.createElement('script');
+        script.src = `https://www.paypal.com/sdk/js?client-id=${PAYPAL_CLIENT_ID}&currency=USD`;
+        script.onload = () => {
+          paypalLoaded = true;
+          createPayPalButton(container);
+        };
+        script.onerror = () => {
+          container.innerHTML = '<div style="color:#f87171; font-size:13px;">Failed to load PayPal. Check your Client ID.</div>';
+        };
+        document.body.appendChild(script);
+      } else if (paypalLoaded) {
+        createPayPalButton(container);
+      } else {
+        container.innerHTML = `
+          <div style="background:#1e2937; border:1px solid #334155; padding:14px; border-radius:10px; font-size:13px;">
+            <strong>PayPal not configured yet.</strong><br>
+            PayPal is now configured with your Sandbox Client ID. Test payments first before switching to Live.
+          </div>
+        `;
+      }
+    }
+
+    function createPayPalButton(container) {
+      container.innerHTML = '';
+
+      if (!window.paypal) {
+        container.innerHTML = '<div style="color:#f87171;">PayPal SDK failed to load.</div>';
+        return;
+      }
+
+      window.paypal.Buttons({
+        style: {
+          layout: 'vertical',
+          color: 'gold',
+          shape: 'rect',
+          label: 'pay'
+        },
+        createOrder: (data, actions) => {
+          return actions.order.create({
+            purchase_units: [{
+              description: `Aether Music — ${selectedLicense.track.title} (${selectedLicense.name})`,
+              amount: {
+                currency_code: "USD",
+                value: selectedLicense.price.toFixed(2)
+              }
+            }]
+          });
+        },
+        onApprove: (data, actions) => {
+          return actions.order.capture().then((details) => {
+            // Payment successful!
+            hideDownloadModal();
+            showPurchaseSuccess(details);
+          });
+        },
+        onError: (err) => {
+          console.error('PayPal error:', err);
+          alert('There was a problem with the PayPal payment. Please try again.');
+        }
+      }).render(container);
+    }
+
+    function showPurchaseSuccess(paypalDetails) {
+      const modal = document.getElementById('success-modal');
+      const detailsEl = document.getElementById('success-details');
+
+      const license = selectedLicense;
+      if (!license) return;
+
+      detailsEl.innerHTML = `
+        <div style="margin-bottom:12px;">
+          <strong style="color:#e2e8f0;">${license.track.title}</strong><br>
+          <span style="color:#64748b;">${license.name}</span>
         </div>
-        <div onclick="updatePrice(${selectedTrack.price})" style="display:flex;justify-content:space-between;border:1px solid #6366f1;background:#1e2937;padding:12px 16px;border-radius:12px;cursor:pointer;">
-          <div>Commercial License</div><div style="font-weight:600;">$${selectedTrack.price}</div>
+        <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+          <span>Amount paid</span>
+          <strong>$${license.price.toFixed(2)}</strong>
+        </div>
+        <div style="margin-top:8px; font-size:12px; color:#94a3b8;">
+          ${license.description}
+        </div>
+        <div style="font-size:11px; color:#64748b; margin-top:12px;">
+          PayPal Transaction: ${paypalDetails.id || 'Completed'}
         </div>
       `;
 
-      document.getElementById('download-modal').style.display = 'flex';
-      updatePrice(selectedTrack.price);
+      // Store for download button
+      window.lastPurchasedTrack = license.track;
+      window.lastPurchasedLicense = license;
+
+      modal.style.display = 'flex';
     }
 
-    function updatePrice(price) {
-      document.getElementById('modal-total-price').textContent = '$' + price;
+    async function downloadPurchasedTrack() {
+      if (!window.lastPurchasedTrack) return;
+
+      const track = window.lastPurchasedTrack;
+      const safeFilename = track.title.replace(/[^a-z0-9]/gi, '_') + '.mp3';
+      const btn = event.currentTarget;
+
+      const originalText = btn ? btn.innerHTML : '';
+
+      try {
+        if (btn) btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Downloading...';
+
+        const response = await fetch(track.audio);
+        if (!response.ok) throw new Error('Network response was not ok');
+
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = safeFilename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+
+        if (btn) btn.innerHTML = '<i class="fa-solid fa-check"></i> Downloaded!';
+
+      } catch (err) {
+        console.error('Forced download failed:', err);
+        // Fallback: open in new tab
+        window.open(track.audio, '_blank');
+        if (btn) btn.innerHTML = originalText;
+        alert('Your browser blocked the automatic download.\n\nThe file was opened in a new tab.\nRight-click the player → "Save audio as..." to download it.');
+      }
     }
 
     function hideDownloadModal() {
       document.getElementById('download-modal').style.display = 'none';
+      document.getElementById('paypal-container').innerHTML = '';
+      // Clear any previous purchase data when starting a new license flow
+      window.lastPurchasedTrack = null;
+      window.lastPurchasedLicense = null;
     }
 
-    function completePurchase() {
-      hideDownloadModal();
-      showToast('Purchase successful! License sent to your email.');
-
-      if (selectedTrack) {
-        const link = document.createElement('a');
-        link.href = selectedTrack.audio;
-        link.download = selectedTrack.title + '.mp3';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-      }
+    function hideSuccessModal() {
+      document.getElementById('success-modal').style.display = 'none';
+      // Clear purchase data so the download link can't be reused later
+      window.lastPurchasedTrack = null;
+      window.lastPurchasedLicense = null;
     }
 
     // ==================== MISC ====================
