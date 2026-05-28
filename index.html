@@ -620,9 +620,7 @@
     let favorites = new Set();
 
     // ==================== PAYPAL CONFIG ====================
-    // TODO: Replace this with your real PayPal Client ID (from https://developer.paypal.com)
-    // Start with Sandbox for testing, then switch to Live when ready.
-    const PAYPAL_CLIENT_ID = 'AR-rcs3slY8J438RUooogLyIvEu0KqlCZ-OAMfhQ25OS-eYXmm6YLmDT5r_mJNXF5i9DCquUjLTcUhsO';   // Sandbox Client ID
+    const PAYPAL_CLIENT_ID = 'Ac713iP1PElCe_ZNUfNt_bum69VRfXWATIYRs7tv4V2vcPtGXuLaZAHi6M-hmJrRGE-DPz1syDIpYJNR';   // Live Client ID
     let paypalLoaded = false;
     let selectedLicense = null;   // { tier, price, name, track }
 
@@ -772,6 +770,11 @@
 
       currentAudio.ontimeupdate = updatePlayerProgress;
       currentAudio.onended = () => {
+        document.getElementById('player-play-icon').classList.replace('fa-pause', 'fa-play');
+        document.getElementById('player-main-play').classList.replace('fa-pause', 'fa-play');
+      };
+      currentAudio.onerror = () => {
+        showToast("Audio failed to load (404 or CORS issue). Upload the MP3s to R2.");
         document.getElementById('player-play-icon').classList.replace('fa-pause', 'fa-play');
         document.getElementById('player-main-play').classList.replace('fa-pause', 'fa-play');
       };
@@ -936,7 +939,7 @@
         container.innerHTML = `
           <div style="background:#1e2937; border:1px solid #334155; padding:14px; border-radius:10px; font-size:13px;">
             <strong>PayPal not configured yet.</strong><br>
-            PayPal is now configured with your Sandbox Client ID. Test payments first before switching to Live.
+            Add your PayPal Client ID in the code to enable payments.
           </div>
         `;
       }
@@ -1018,13 +1021,8 @@
 
       const track = window.lastPurchasedTrack;
       const safeFilename = track.title.replace(/[^a-z0-9]/gi, '_') + '.mp3';
-      const btn = event.currentTarget;
-
-      const originalText = btn ? btn.innerHTML : '';
 
       try {
-        if (btn) btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Downloading...';
-
         const response = await fetch(track.audio);
         if (!response.ok) throw new Error('Network response was not ok');
 
@@ -1039,13 +1037,10 @@
         document.body.removeChild(a);
         window.URL.revokeObjectURL(url);
 
-        if (btn) btn.innerHTML = '<i class="fa-solid fa-check"></i> Downloaded!';
-
       } catch (err) {
         console.error('Forced download failed:', err);
         // Fallback: open in new tab
         window.open(track.audio, '_blank');
-        if (btn) btn.innerHTML = originalText;
         alert('Your browser blocked the automatic download.\n\nThe file was opened in a new tab.\nRight-click the player → "Save audio as..." to download it.');
       }
     }

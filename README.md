@@ -6,6 +6,8 @@ A clean, professional public website for selling licenses to your AI-generated m
 - **Frontend**: Vercel (static site)
 - **Media (audio + covers)**: Cloudflare R2 (`aether-music` bucket)
 
+> **Note:** Audio was previously served from a temporary Cloudflare Worker (`aether-audio.6pwsdd4z7c.workers.dev`) that has been shut down. All tracks now use the stable R2 public URL.
+
 ---
 
 ## Your R2 Public URL
@@ -13,6 +15,8 @@ A clean, professional public website for selling licenses to your AI-generated m
 You provided this public development URL:
 
 **Base URL:** `https://pub-d36e4f8ccd12409cb5f92373630441e1.r2.dev`
+
+**Live Site:** https://aether-music-gamma.vercel.app/
 
 All your audio and cover files will be served from here.
 
@@ -98,12 +102,12 @@ Since your site will be on Vercel and audio will play from R2, you **must** conf
 [
   {
     "AllowedOrigins": [
-      "https://your-project.vercel.app",
-      "https://www.yourdomain.com"
+      "https://aether-music-gamma.vercel.app",
+      "https://*.vercel.app"
     ],
     "AllowedMethods": ["GET", "HEAD"],
     "AllowedHeaders": ["*"],
-    "ExposeHeaders": ["Content-Length", "Content-Range"],
+    "ExposeHeaders": ["Content-Length", "Content-Range", "Accept-Ranges"],
     "MaxAgeSeconds": 3600
   }
 ]
@@ -155,6 +159,45 @@ This site is a pure static site (no build step). We've prepared it with `vercel.
 
 ### Alternative: Deploy without Git (quick test)
 You can also drag & drop the folder onto Vercel, but GitHub route is strongly recommended.
+
+---
+
+## Monetization: Real PayPal Checkout
+
+The site now has a fully working licensing + PayPal flow.
+
+### How it works
+- Visitors click **"License"** on any track
+- They choose one of three professional license tiers:
+  - **Personal** — $0.99
+  - **Commercial** — $4.99
+  - **Broadcast & Sync** — $19.99
+- Real PayPal payment is processed
+- On successful payment they get an instant MP3 download + clear license confirmation
+
+### Setup Steps (Required to accept real money)
+
+1. **Create a PayPal Business account** (if you don't have one)
+2. Go to the [PayPal Developer Dashboard](https://developer.paypal.com)
+3. Create a new **App** (or use the default one)
+4. Copy your **Live Client ID**
+5. Open `index.html` and update this line:
+
+   ```js
+   const PAYPAL_CLIENT_ID = 'YOUR_LIVE_CLIENT_ID_HERE';
+   ```
+
+6. Deploy the change to Vercel.
+
+### Testing the Flow
+- For testing without real money, temporarily switch the Client ID back to a Sandbox one.
+- Use PayPal Sandbox buyer accounts for testing.
+- After a successful payment, the MP3 should download automatically.
+
+### Important Notes
+- All payments go directly to your PayPal account
+- You are responsible for delivering value and honoring the license terms you advertise
+- Consider adding a proper license PDF later for higher-tier purchases
 
 ---
 
