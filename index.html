@@ -437,6 +437,184 @@
       z-index: 400;
     }
 
+    /* ============================================================
+       MOBILE EXPERIENCE — Making it overwhelmingly good on phones
+       ============================================================ */
+
+    @media (max-width: 768px) {
+      .container {
+        padding: 0 12px;
+      }
+
+      .main-layout {
+        flex-direction: column;
+        gap: 16px;
+        padding: 16px 0 90px;
+      }
+
+      .sidebar {
+        width: 100%;
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 12px;
+        padding-bottom: 8px;
+        border-bottom: 1px solid #1f2937;
+        margin-bottom: 8px;
+      }
+
+      .sidebar > div {
+        flex: 1 1 45%;
+        min-width: 140px;
+      }
+
+      /* Make mobile filters feel more premium */
+      .sidebar-title {
+        font-size: 10px;
+        margin-bottom: 4px;
+        color: #64748b;
+      }
+
+      .mood-chip {
+        font-size: 12px;
+        padding: 5px 11px;
+      }
+
+      .sidebar-title {
+        font-size: 10px;
+        margin-bottom: 6px;
+      }
+
+      .music-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+      }
+
+      .card-cover {
+        height: 140px;
+      }
+
+      .card-body {
+        padding: 8px 10px 10px;
+      }
+
+      .card-title {
+        font-size: 13px;
+        line-height: 1.2;
+      }
+
+      .card-artist {
+        font-size: 11px;
+      }
+
+      .hero {
+        padding: 24px 0 20px;
+      }
+
+      .hero h1 {
+        font-size: 32px;
+        line-height: 1.1;
+      }
+
+      .hero p {
+        font-size: 14px;
+        margin-bottom: 16px;
+      }
+
+      .results-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+        margin-bottom: 12px;
+      }
+
+      .results-count {
+        font-size: 16px;
+      }
+
+      .controls {
+        width: 100%;
+      }
+
+      .controls input {
+        width: 100%;
+        font-size: 14px;
+      }
+
+      .controls select {
+        font-size: 13px;
+      }
+
+      .nav-inner {
+        flex-wrap: wrap;
+        height: auto;
+        padding: 8px 0;
+      }
+
+      .search-bar {
+        width: 100%;
+        max-width: none;
+        margin-top: 8px;
+      }
+
+      .global-player .player-inner {
+        padding: 8px 12px;
+        gap: 10px;
+      }
+
+      .modal-content {
+        padding: 18px;
+        border-radius: 16px;
+        margin: 8px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .music-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+      }
+
+      .card-cover {
+        height: 120px;
+      }
+
+      .card-body {
+        padding: 6px 8px 8px;
+      }
+
+      .card-title {
+        font-size: 12px;
+      }
+
+      .mood-chip {
+        font-size: 11px;
+        padding: 4px 10px;
+      }
+
+      .player-inner {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 6px;
+      }
+
+      .global-player .progress-container {
+        order: -1;
+        width: 100%;
+      }
+    }
+
+    /* Stronger touch targets on mobile */
+    @media (max-width: 768px) {
+      button,
+      .mood-chip,
+      .filter-option,
+      .btn-play,
+      .btn-license,
+      .play-btn {
+        min-height: 44px;
+        min-width: 44px;
+      }
+    }
   </style>
 </head>
 <body>
