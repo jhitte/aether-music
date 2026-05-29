@@ -862,7 +862,7 @@
     let currentTrackId = null;
     let favorites = new Set();
 
-    const PREVIEW_SECONDS = 30; // Preview length in seconds
+    const PREVIEW_SECONDS = 90; // Preview length in seconds (1.5 minutes)
 
     function isMobileDevice() {
       return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) 
@@ -1130,7 +1130,7 @@
           currentAudio.pause();
           document.getElementById('player-play-icon').classList.replace('fa-pause', 'fa-play');
           document.getElementById('player-main-play').classList.replace('fa-pause', 'fa-play');
-          showToast("30-second preview ended. License the track to hear the full song.");
+          showToast("1.5-minute preview ended. License the track to hear the full song.");
         }
       };
 
