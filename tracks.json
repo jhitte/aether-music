@@ -59,15 +59,14 @@
       "artist": "PW Peck",
       "duration": "3:45",
       "bpm": 78,
-      "genre": "Blues",
-      "subgenres": [],
+      "genre": "Reggae",
       "mood": [
         "Romantic",
         "Smooth"
       ],
       "price": 0.99,
-      "audio": "https://pub-d36e4f8ccd12409cb5f92373630441e1.r2.dev/audio/Beautiful_Night_JoJo2.mp3",
-      "cover": "https://pub-d36e4f8ccd12409cb5f92373630441e1.r2.dev/covers/Beautiful_Night_JoJo2.jpg",
+      "audio": "",
+      "cover": "",
       "plays": 0,
       "downloads": 0,
       "isNew": true,
