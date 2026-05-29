@@ -79,15 +79,15 @@
       "artist": "PW Peck",
       "duration": "4:05",
       "bpm": 82,
-      "genre": "Blues",
-      "subgenres": [],
+      "genre": "Smooth Jazz",
       "mood": [
         "Calm",
-        "Reflective"
+        "Reflective",
+        "romantic"
       ],
       "price": 0.99,
-      "audio": "https://pub-d36e4f8ccd12409cb5f92373630441e1.r2.dev/audio/Blue_Water.mp3",
-      "cover": "https://pub-d36e4f8ccd12409cb5f92373630441e1.r2.dev/covers/Blue_Water.jpg",
+      "audio": "",
+      "cover": "",
       "plays": 0,
       "downloads": 0,
       "isNew": true,
