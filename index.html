@@ -836,6 +836,8 @@
     let currentTrackId = null;
     let favorites = new Set();
 
+    const PREVIEW_SECONDS = 30; // Preview length in seconds
+
     function isMobileDevice() {
       return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) 
              || window.innerWidth < 768;
@@ -1082,13 +1084,30 @@
       document.getElementById('player-title').textContent = track.title;
       document.getElementById('player-artist').textContent = track.artist;
 
+      // Show preview length instead of full duration
+      const previewMins = Math.floor(PREVIEW_SECONDS / 60);
+      const previewSecs = PREVIEW_SECONDS % 60;
+      document.getElementById('player-duration').textContent = 
+        `${previewMins}:${previewSecs.toString().padStart(2,'0')}`;
+
       if (currentAudio) currentAudio.pause();
 
       currentTrackId = id;
       currentAudio = new Audio(track.audio);
       currentAudio.volume = parseInt(document.getElementById('player-volume').value) / 100;
 
-      currentAudio.ontimeupdate = updatePlayerProgress;
+      currentAudio.ontimeupdate = () => {
+        updatePlayerProgress();
+
+        // Stop preview after PREVIEW_SECONDS
+        if (currentAudio.currentTime >= PREVIEW_SECONDS) {
+          currentAudio.pause();
+          document.getElementById('player-play-icon').classList.replace('fa-pause', 'fa-play');
+          document.getElementById('player-main-play').classList.replace('fa-pause', 'fa-play');
+          showToast("30-second preview ended. License the track to hear the full song.");
+        }
+      };
+
       currentAudio.onended = () => {
         document.getElementById('player-play-icon').classList.replace('fa-pause', 'fa-play');
         document.getElementById('player-main-play').classList.replace('fa-pause', 'fa-play');
@@ -1103,24 +1122,40 @@
         showToast("Could not play audio. Make sure the file exists.");
       });
 
+      // Ensure we don't start past the preview limit
+      if (currentAudio.currentTime > PREVIEW_SECONDS) {
+        currentAudio.currentTime = 0;
+      }
+
       document.getElementById('player-play-icon').classList.replace('fa-play', 'fa-pause');
       document.getElementById('player-main-play').classList.replace('fa-play', 'fa-pause');
     }
 
     function updatePlayerProgress() {
       if (!currentAudio) return;
-      const percent = (currentAudio.currentTime / currentAudio.duration) * 100 || 0;
+
+      // Cap time display and progress at preview length
+      const displayTime = Math.min(currentAudio.currentTime, PREVIEW_SECONDS);
+      const percent = (displayTime / PREVIEW_SECONDS) * 100;
+
       document.getElementById('player-progress').value = percent;
 
-      const mins = Math.floor(currentAudio.currentTime / 60);
-      const secs = Math.floor(currentAudio.currentTime % 60);
+      const mins = Math.floor(displayTime / 60);
+      const secs = Math.floor(displayTime % 60);
       document.getElementById('player-current-time').textContent = `${mins}:${secs.toString().padStart(2,'0')}`;
     }
 
     function seekAudio() {
       if (!currentAudio) return;
       const val = document.getElementById('player-progress').value;
-      currentAudio.currentTime = (val / 100) * currentAudio.duration;
+      let newTime = (val / 100) * currentAudio.duration;
+
+      // Prevent seeking past the preview limit
+      if (newTime > PREVIEW_SECONDS) {
+        newTime = PREVIEW_SECONDS;
+      }
+
+      currentAudio.currentTime = newTime;
     }
 
     function togglePlay() {
