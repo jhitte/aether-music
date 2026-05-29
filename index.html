@@ -628,12 +628,27 @@
 
     /* Desktop hero improvements - better use of space without affecting mobile */
     @media (min-width: 900px) {
+      .hero {
+        text-align: center;
+      }
+
       .hero h1 {
-        max-width: 720px;
+        max-width: 900px;
+        margin-left: auto;
+        margin-right: auto;
       }
 
       .hero p {
-        max-width: 520px;
+        max-width: 700px;
+        margin-left: auto;
+        margin-right: auto;
+      }
+
+      /* Center the button row and stats row */
+      .hero > div[style*="display:flex"] {
+        justify-content: center;
+        margin-left: auto;
+        margin-right: auto;
       }
     }
   </style>
