@@ -258,6 +258,26 @@
       "isNew": true,
       "aiGenerated": true,
       "created": "2026-05-31"
+    },
+    {
+      "id": 1780265017178,
+      "title": "I know you Care",
+      "artist": "JDH",
+      "duration": "4:23",
+      "bpm": 0,
+      "genre": "Country Love Song",
+      "mood": [
+        "Romantic",
+        "Smooth"
+      ],
+      "price": 0.99,
+      "audio": "https://pub-d36e4f8ccd12409cb5f92373630441e1.r2.dev/audio/i_know_you-care.mp3",
+      "cover": "https://pub-d36e4f8ccd12409cb5f92373630441e1.r2.dev/covers/i_know_you-care.jpg",
+      "plays": 0,
+      "downloads": 0,
+      "isNew": true,
+      "aiGenerated": true,
+      "created": "2026-05-31"
     }
   ]
 }
