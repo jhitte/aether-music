@@ -191,8 +191,8 @@
         "Heartfelt"
       ],
       "price": 0.99,
-      "audio": "",
-      "cover": "",
+      "audio": "https://pub-d36e4f8ccd12409cb5f92373630441e1.r2.dev/audio/It's_Not_Easy_Lovin_You.mp3",
+      "cover": "https://pub-d36e4f8ccd12409cb5f92373630441e1.r2.dev/covers/It's_Not_Easy_Lovin_You.jpg",
       "plays": 0,
       "downloads": 0,
       "isNew": true,
