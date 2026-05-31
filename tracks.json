@@ -202,19 +202,17 @@
     },
     {
       "id": 10,
-      "title": "Tired Bones 2",
+      "title": "Tired Bones",
       "artist": "PW Peck",
-      "duration": "3:55",
+      "duration": "2:10",
       "bpm": 78,
-      "genre": "Blues",
-      "subgenres": [],
+      "genre": "Reggae",
       "mood": [
-        "Weary",
-        "Soulful"
+        "smooth"
       ],
       "price": 0.99,
-      "audio": "https://pub-d36e4f8ccd12409cb5f92373630441e1.r2.dev/audio/Tired_Bones2.mp3",
-      "cover": "https://pub-d36e4f8ccd12409cb5f92373630441e1.r2.dev/covers/Tired_Bones2.jpg",
+      "audio": "https://pub-d36e4f8ccd12409cb5f92373630441e1.r2.dev/audio/tired_bones.mp3",
+      "cover": "https://pub-d36e4f8ccd12409cb5f92373630441e1.r2.dev/covers/tired_bones.jpg",
       "plays": 0,
       "downloads": 0,
       "isNew": true,
