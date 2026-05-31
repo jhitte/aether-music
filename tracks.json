@@ -241,23 +241,23 @@
       "created": "2026-05-29"
     },
     {
-      "id": 1780176460216,
-      "title": "McDonald's Chaos",
+      "id": 1780261002315,
+      "title": "A Target at Brickey's",
       "artist": "JDH",
-      "duration": "3:44",
+      "duration": "2:54",
       "bpm": 0,
       "genre": "Country, funny",
       "mood": [
         "Funny"
       ],
       "price": 0.99,
-      "audio": "https://pub-d36e4f8ccd12409cb5f92373630441e1.r2.dev/audio/mcdonalds_chaos.mp3",
-      "cover": "https://pub-d36e4f8ccd12409cb5f92373630441e1.r2.dev/covers/mcdonalds_chaos.jpg",
+      "audio": "https://pub-d36e4f8ccd12409cb5f92373630441e1.r2.dev/audio/A Target at Brickey's.mp3",
+      "cover": "https://pub-d36e4f8ccd12409cb5f92373630441e1.r2.dev/covers/A Target at Brickey's.jpg",
       "plays": 0,
       "downloads": 0,
       "isNew": true,
       "aiGenerated": true,
-      "created": "2026-05-30"
+      "created": "2026-05-31"
     }
   ]
 }
