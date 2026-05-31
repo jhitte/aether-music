@@ -186,13 +186,14 @@
       "duration": "4:38",
       "bpm": 72,
       "genre": "Country",
+      "subgenres": [],
       "mood": [
         "Emotional",
         "Heartfelt"
       ],
       "price": 0.99,
-      "audio": "https://pub-d36e4f8ccd12409cb5f92373630441e1.r2.dev/audio/It's_Not_Easy_Lovin_You.mp3",
-      "cover": "https://pub-d36e4f8ccd12409cb5f92373630441e1.r2.dev/covers/It's_Not_Easy_Lovin_You.jpg",
+      "audio": "https://pub-d36e4f8ccd12409cb5f92373630441e1.r2.dev/audio/Its_Not_Easy_Lovin_You.mp3",
+      "cover": "https://pub-d36e4f8ccd12409cb5f92373630441e1.r2.dev/covers/Its_Not_Easy_Lovin_You.jpg",
       "plays": 0,
       "downloads": 0,
       "isNew": true,
@@ -206,8 +207,9 @@
       "duration": "2:10",
       "bpm": 78,
       "genre": "Reggae",
+      "subgenres": [],
       "mood": [
-        "smooth"
+        "Smooth"
       ],
       "price": 0.99,
       "audio": "https://pub-d36e4f8ccd12409cb5f92373630441e1.r2.dev/audio/Tired_Bones2.mp3",
@@ -223,8 +225,11 @@
       "title": "Bubba and Clem went Fishin'",
       "artist": "JDH",
       "duration": "3:37",
-      "bpm": 0,
-      "genre": "Country, funny",
+      "bpm": 92,
+      "genre": "Country",
+      "subgenres": [
+        "Comedy"
+      ],
       "mood": [
         "Funny"
       ],
@@ -242,14 +247,17 @@
       "title": "A Target at Brickey's",
       "artist": "JDH",
       "duration": "2:54",
-      "bpm": 0,
-      "genre": "Country, funny",
+      "bpm": 86,
+      "genre": "Country",
+      "subgenres": [
+        "Comedy"
+      ],
       "mood": [
         "Funny"
       ],
       "price": 0.99,
-      "audio": "https://pub-d36e4f8ccd12409cb5f92373630441e1.r2.dev/audio/A Target at Brickey's.mp3",
-      "cover": "https://pub-d36e4f8ccd12409cb5f92373630441e1.r2.dev/covers/A Target at Brickey's.jpg",
+      "audio": "https://pub-d36e4f8ccd12409cb5f92373630441e1.r2.dev/audio/a_target_at_brickeys.mp3",
+      "cover": "https://pub-d36e4f8ccd12409cb5f92373630441e1.r2.dev/covers/a_target_at_brickeys.jpg",
       "plays": 0,
       "downloads": 0,
       "isNew": true,
@@ -261,15 +269,18 @@
       "title": "I know you Care",
       "artist": "JDH",
       "duration": "4:23",
-      "bpm": 0,
-      "genre": "Country Love Song",
+      "bpm": 68,
+      "genre": "Country",
+      "subgenres": [
+        "Love Song"
+      ],
       "mood": [
         "Romantic",
         "Smooth"
       ],
       "price": 0.99,
-      "audio": "https://pub-d36e4f8ccd12409cb5f92373630441e1.r2.dev/audio/i_know_you-care.mp3",
-      "cover": "https://pub-d36e4f8ccd12409cb5f92373630441e1.r2.dev/covers/i_know_you-care.jpg",
+      "audio": "https://pub-d36e4f8ccd12409cb5f92373630441e1.r2.dev/audio/i_know_you_care.mp3",
+      "cover": "https://pub-d36e4f8ccd12409cb5f92373630441e1.r2.dev/covers/i_know_you_care.jpg",
       "plays": 0,
       "downloads": 0,
       "isNew": true,
