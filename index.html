@@ -257,7 +257,7 @@
     .music-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-      gap: 18px;
+      gap: 24px;
     }
 
     .music-card {
@@ -285,7 +285,7 @@
     }
 
     .card-cover {
-      height: 180px;
+      aspect-ratio: 1 / 1;
       background: #0a0f1c;
       position: relative;
       cursor: pointer;
@@ -296,6 +296,7 @@
       height: 100%;
       object-fit: cover;
       transition: transform 0.4s ease;
+      display: block;
     }
     .music-card:hover .card-cover img {
       transform: scale(1.05);
@@ -328,7 +329,7 @@
     }
 
     .card-body {
-      padding: 14px 16px 16px;
+      padding: 12px 14px 14px;
     }
     .card-title {
       font-size: 15px;
@@ -496,11 +497,11 @@
 
       .music-grid {
         grid-template-columns: repeat(2, 1fr);
-        gap: 10px;
+        gap: 16px;
       }
 
       .card-cover {
-        height: 140px;
+        aspect-ratio: 1 / 1;
       }
 
       .card-cover img {
@@ -588,11 +589,11 @@
     @media (max-width: 480px) {
       .music-grid {
         grid-template-columns: repeat(2, 1fr);
-        gap: 8px;
+        gap: 12px;
       }
 
       .card-cover {
-        height: 120px;
+        aspect-ratio: 1 / 1;
       }
 
       .card-cover img {
