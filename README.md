@@ -199,6 +199,21 @@ The site now has a fully working licensing + PayPal flow.
 - You are responsible for delivering value and honoring the license terms you advertise
 - Consider adding a proper license PDF later for higher-tier purchases
 
+### Security Warning (Client ID Exposure)
+The real **Live PayPal Client ID** has been **removed** from the repository for safety.
+
+- The real value is stored locally in the file `PAYPAL_LIVE_CLIENT_ID.txt` (this file is gitignored).
+- To restore it, copy the ID from that file and paste it into `index.html` as `PAYPAL_CLIENT_ID`.
+
+Because this is a **static site**, once restored the Client ID will still be visible to anyone who views the source of the live site (this is unavoidable with a pure client-side PayPal JavaScript SDK integration).
+
+**Recommended actions:**
+1. Restrict the app in your PayPal Developer Dashboard to only your Vercel domains when possible.
+2. Never commit the real Client ID.
+3. Consider moving order creation to a serverless function in the future for better security.
+
+The code contains clear instructions on how to restore the key.
+
 ---
 
 ## Local Development vs Production

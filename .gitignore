@@ -12,3 +12,8 @@ assets/
 .DS_Store
 Thumbs.db
 *.log
+
+# Secrets / PayPal credentials (do not commit)
+PAYPAL_LIVE_CLIENT_ID.txt
+.env*
+*.secret

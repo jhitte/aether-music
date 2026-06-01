@@ -290,17 +290,12 @@
       position: relative;
       cursor: pointer;
       overflow: hidden;
-      display: flex;
-      align-items: flex-start;
-      justify-content: flex-start;
     }
     .card-cover img {
-      max-width: 100%;
-      max-height: 100%;
-      object-fit: contain;
-      object-position: top left;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
       transition: transform 0.4s ease;
-      display: block;
     }
     .music-card:hover .card-cover img {
       transform: scale(1.05);
@@ -506,9 +501,13 @@
 
       .card-cover {
         height: 140px;
-        display: flex;
-        align-items: flex-start;
-        justify-content: flex-start;
+      }
+
+      .card-cover img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.4s ease;
       }
 
       .card-body {
@@ -594,9 +593,13 @@
 
       .card-cover {
         height: 120px;
-        display: flex;
-        align-items: flex-start;
-        justify-content: flex-start;
+      }
+
+      .card-cover img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.4s ease;
       }
 
       .card-body {
@@ -689,7 +692,7 @@
             <div style="width:32px; height:32px; border-radius:50%; overflow:hidden; border:1px solid #334155;">
               <img src="https://i.pravatar.cc/32?img=47" style="width:100%; height:100%; object-fit:cover;">
             </div>
-            <span style="font-size:14px; font-weight:500;">Alex Rivera <span style="background:#10b981; color:white; font-size:9px; padding:1px 5px; border-radius:4px; font-weight:700;">PRO</span></span>
+            <span style="font-size:14px; font-weight:500;">Account</span>
           </div>
         </div>
       </div>
@@ -712,7 +715,7 @@
           <img src="https://i.pravatar.cc/22?img=32" style="width:22px; height:22px; border-radius:50%; border:2px solid #0a0f1c; margin-left:-6px;">
           <img src="https://i.pravatar.cc/22?img=47" style="width:22px; height:22px; border-radius:50%; border:2px solid #0a0f1c; margin-left:-6px;">
         </div>
-        <span>Used by <strong style="color:#e2e8f0;">47,892</strong> creators worldwide</span>
+        <span>Trusted by independent creators &amp; media projects</span>
       </div>
     </div>
   </div>
@@ -979,7 +982,20 @@
     }
 
     // ==================== PAYPAL CONFIG ====================
-    const PAYPAL_CLIENT_ID = 'Ac713iP1PElCe_ZNUfNt_bum69VRfXWATIYRs7tv4V2vcPtGXuLaZAHi6M-hmJrRGE-DPz1syDIpYJNR';   // Live Client ID
+    // ⚠️ SECURITY WARNING: Live PayPal Client ID has been REMOVED from this repo.
+    //
+    // The real Live Client ID is stored locally in: PAYPAL_LIVE_CLIENT_ID.txt
+    //
+    // To restore it:
+    //   1. Open PAYPAL_LIVE_CLIENT_ID.txt (in this same folder)
+    //   2. Copy the Client ID value
+    //   3. Paste it below as PAYPAL_CLIENT_ID
+    //
+    // This file is gitignored and should never be committed.
+    //
+    // Anyone viewing the source of the live site will still see the Client ID
+    // (this is unavoidable with a pure static site + client-side PayPal SDK).
+    const PAYPAL_CLIENT_ID = 'YOUR_LIVE_PAYPAL_CLIENT_ID_HERE';
     let paypalLoaded = false;
     let selectedLicense = null;   // { tier, price, name, track }
 
@@ -988,8 +1004,21 @@
       try {
         const res = await fetch('tracks.json');
         const data = await res.json();
-        allTracks = data.tracks || [];
+        const rawTracks = data.tracks || [];
+        allTracks = rawTracks.map(normalizeTrack);
         filteredTracks = [...allTracks];
+
+        // Light runtime validation (helps catch bad data early)
+        const problems = [];
+        allTracks.forEach(t => {
+          if (!t.bpm || t.bpm < 40) problems.push(`Low/zero BPM: ${t.title}`);
+          if (!t.duration || !t.duration.includes(':')) problems.push(`Bad duration: ${t.title}`);
+          if (!Array.isArray(t.mood) || t.mood.length === 0) problems.push(`No moods: ${t.title}`);
+        });
+        if (problems.length) {
+          console.warn('[Aether Data Validation] Issues found in tracks.json:\n' + problems.join('\n'));
+        }
+
         renderFilters();
         renderTracks();
         document.getElementById('results-count').textContent = `${allTracks.length.toLocaleString()} tracks`;
@@ -999,10 +1028,54 @@
       }
     }
 
+    function normalizeTrack(t) {
+      const track = { ...t };
+
+      // Ensure mood is always a clean array of strings
+      if (Array.isArray(track.mood)) {
+        track.mood = track.mood.map(m => String(m || '').trim()).filter(Boolean);
+      } else if (typeof track.mood === 'string' && track.mood) {
+        track.mood = track.mood.split(',').map(m => m.trim()).filter(Boolean);
+      } else {
+        track.mood = [];
+      }
+
+      // Ensure subgenres is always an array
+      if (!Array.isArray(track.subgenres)) {
+        track.subgenres = track.subgenres ? [track.subgenres] : [];
+      }
+      track.subgenres = track.subgenres.map(s => String(s || '').trim()).filter(Boolean);
+
+      // Clean genre for reliable filtering (take first part if comma-separated junk exists)
+      if (typeof track.genre === 'string' && track.genre) {
+        track._rawGenre = track.genre;
+        track.genre = track.genre.split(',')[0].trim();
+      } else {
+        track.genre = track.genre || 'Other';
+      }
+
+      // Normalize numeric fields defensively
+      track.bpm = Number(track.bpm) || 0;
+      track.plays = Number(track.plays) || 0;
+      track.downloads = Number(track.downloads) || 0;
+      track.price = Number(track.price) || 0.99;
+
+      return track;
+    }
+
     // ==================== FILTERS ====================
     function renderFilters() {
-      const genres = [...new Set(allTracks.map(t => t.genre))];
-      const moods = [...new Set(allTracks.map(t => t.mood))];
+      // Unique primary genres (after normalization)
+      const genres = [...new Set(allTracks.map(t => t.genre))].filter(Boolean).sort();
+
+      // Properly flatten mood arrays for filter chips
+      const moodSet = new Set();
+      allTracks.forEach(t => {
+        (t.mood || []).forEach(m => {
+          if (m) moodSet.add(m);
+        });
+      });
+      const moods = [...moodSet].sort();
 
       const genreEl = document.getElementById('filter-genres');
       genreEl.innerHTML = genres.map(g => `
@@ -1031,15 +1104,24 @@
       const activeMoods = Array.from(document.querySelectorAll('#filter-moods .mood-chip.active')).map(el => el.textContent.trim());
 
       filteredTracks = allTracks.filter(t => {
-        const hay = `${t.title} ${t.artist} ${t.genre} ${t.mood}`.toLowerCase();
+        const moodStr = Array.isArray(t.mood) ? t.mood.join(' ') : '';
+        const hay = `${t.title} ${t.artist} ${t.genre} ${moodStr}`.toLowerCase();
+
         if (search && !hay.includes(search)) return false;
+
         if (activeGenres.length && !activeGenres.includes(t.genre)) return false;
-        if (activeMoods.length && !activeMoods.includes(t.mood)) return false;
+
+        if (activeMoods.length) {
+          const trackMoods = Array.isArray(t.mood) ? t.mood : [];
+          const hasMatch = activeMoods.some(m => trackMoods.includes(m));
+          if (!hasMatch) return false;
+        }
+
         return true;
       });
 
-      if (sort === 'popular') filteredTracks.sort((a,b) => b.plays - a.plays);
-      else if (sort === 'newest') filteredTracks.sort((a,b) => new Date(b.created) - new Date(a.created));
+      if (sort === 'popular') filteredTracks.sort((a,b) => (b.plays || 0) - (a.plays || 0));
+      else if (sort === 'newest') filteredTracks.sort((a,b) => new Date(b.created || 0) - new Date(a.created || 0));
       else if (sort === 'duration-asc') filteredTracks.sort((a,b) => parseDuration(a.duration) - parseDuration(b.duration));
       else if (sort === 'duration-desc') filteredTracks.sort((a,b) => parseDuration(b.duration) - parseDuration(a.duration));
 
