@@ -1432,23 +1432,35 @@
         },
         createOrder: async () => {
           // Call our server to create the order (uses secret on server)
-          const res = await fetch('/api/create-order', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              amount: selectedLicense.price.toFixed(2),
-              description: `Aether Music — ${selectedLicense.track.title} (${selectedLicense.name})`,
-              trackTitle: selectedLicense.track.title
-            })
-          });
+          try {
+            const res = await fetch('/api/create-order', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                amount: selectedLicense.price.toFixed(2),
+                description: `Aether Music — ${selectedLicense.track.title} (${selectedLicense.name})`,
+                trackTitle: selectedLicense.track.title
+              })
+            });
 
-          const data = await res.json();
-          if (!res.ok || !data.id) {
-            console.error('Create order API error:', data);
-            alert('Failed to create PayPal order: ' + (data.error || 'Check console for details'));
-            throw new Error('Failed to create order: ' + (data.error || 'unknown'));
+            let data = {};
+            try {
+              data = await res.json();
+            } catch (e) {
+              data = { error: 'Invalid response from server' };
+            }
+
+            if (!res.ok || !data.id) {
+              console.error('Create order API error:', data);
+              alert('Failed to create PayPal order: ' + (data.error || 'Server error. Check console.'));
+              throw new Error('Failed to create order: ' + (data.error || 'unknown'));
+            }
+            return data.id;
+          } catch (err) {
+            console.error('Create order fetch error:', err);
+            alert('Failed to contact payment server: ' + (err.message || 'Network error.'));
+            throw err;
           }
-          return data.id;
         },
         onApprove: async (data) => {
           // Call our server to capture the order (verifies payment server-side)
@@ -1472,7 +1484,8 @@
         },
         onError: (err) => {
           console.error('PayPal error:', err);
-          alert('There was a problem with the PayPal payment. Please try again.');
+          const msg = err && err.message ? err.message : 'Please try again.';
+          alert('There was a problem with the PayPal payment: ' + msg);
         }
       }).render(container);
     }
