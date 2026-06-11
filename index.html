@@ -1444,7 +1444,9 @@
 
           const data = await res.json();
           if (!res.ok || !data.id) {
-            throw new Error('Failed to create order');
+            console.error('Create order API error:', data);
+            alert('Failed to create PayPal order: ' + (data.error || 'Check console for details'));
+            throw new Error('Failed to create order: ' + (data.error || 'unknown'));
           }
           return data.id;
         },
