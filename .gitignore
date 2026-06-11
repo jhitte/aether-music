@@ -18,3 +18,4 @@ PAYPAL_LIVE_CLIENT_ID.txt
 .env*
 *.secret
 !.env.example
+VERCEL_ENV_VALUES.txt

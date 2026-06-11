@@ -10,34 +10,30 @@ The site has been heavily secured:
 
 ## Required Steps to Make It Live
 
-1. **Get your PayPal Client Secret**
-   - Go to https://developer.paypal.com/dashboard/applications
-   - Open your "Aether Music" app
-   - Under "API Credentials" or the app details, click to show the **Client Secret** (not just the ID).
+1. **Add Environment Variables in Vercel (easiest way)**
+   - Open the file `VERCEL_ENV_VALUES.txt` in this folder.
+   - Copy the two variables exactly as they are.
+   - Go to your Vercel project dashboard → Settings → Environment Variables.
+   - Add both variables (select Production, Preview, and Development environments).
+   - Save.
 
-2. **Add Environment Variables in Vercel**
-   - Go to your Vercel project (aether-music or whatever it's called)
-   - Settings → Environment Variables
-   - Add these (Production + Preview + Development if you want local testing):
-     - Name: `PAYPAL_CLIENT_ID`
-       Value: `Ac713iP1PElCe_ZNUfNt_bum69VRfXWATIYRs7tv4V2vcPtGXuLaZAHi6M-hmJrRGE-DPz1syDIpYJNR` (or your current public ID)
-     - Name: `PAYPAL_CLIENT_SECRET`
-       Value: (paste the secret you just got from PayPal — keep this private!)
+2. **Redeploy**
+   - Vercel will automatically detect the new `/api` functions.
+   - Trigger a new deployment (or just push any small change if it doesn't start automatically).
+   - After the deployment succeeds, hard refresh your live site.
 
-3. **Redeploy**
-   - Vercel should auto-detect the new api/ folder and trigger a deployment when you push (or trigger manually).
-   - After deploy, hard refresh the live site.
+3. **Test the full flow**
+   - Browse the site on the live URL.
+   - Click "License" on a track.
+   - Complete a real purchase (start with the $0.99 Personal License for testing if desired).
+   - Confirm that after payment you get the "Thank You" screen and the MP3 downloads successfully.
 
-4. **Test**
-   - Go through a full purchase on the live site (start with the $0.99 tier if testing with real money).
-   - Confirm the download works after payment.
+4. **Recommended security step**
+   - In the PayPal Developer Dashboard, restrict your app to only your Vercel domain(s) (e.g. https://aether-music-gamma.vercel.app).
+   - Monitor your PayPal account for the first few transactions.
 
-5. **Optional but recommended**
-   - In PayPal Developer Dashboard, restrict your app to only your Vercel domain(s).
-   - Monitor your PayPal transactions for the first few sales.
+The site is now using secure server-side PayPal order creation and capture. The secret never touches the browser.
 
-The site should now be much more secure for taking real payments while still being a mostly static site.
+If anything goes wrong after deploy, check the Function logs in Vercel (go to the latest deployment → Functions tab).
 
-If anything breaks, check the Vercel Function logs (Deployments → the latest one → Functions tab).
-
-Enjoy the nap! The site should be ready to promote when you're back.
+When you wake up, just follow steps 1-3 above and you should be ready to promote and sell tracks. Sweet dreams!
