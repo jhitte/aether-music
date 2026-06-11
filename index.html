@@ -816,6 +816,11 @@
       </div>
 
       <!-- License Tiers -->
+      <div style="font-size:11px; color:#64748b; margin-bottom:12px; line-height:1.3;">
+        All licenses are <strong>non-exclusive</strong>, worldwide, and perpetual. 
+        You may not resell or redistribute the raw audio file. 
+        Full terms are shown after purchase.
+      </div>
       <div id="license-options" style="display:flex; flex-direction:column; gap:10px; margin-bottom:20px;"></div>
 
       <!-- PayPal Container -->
@@ -829,6 +834,9 @@
         <div style="display:flex; justify-content:space-between; color:#94a3b8;">
           <div id="summary-tier"></div>
           <div id="summary-price" style="font-weight:600; color:white;"></div>
+        </div>
+        <div style="margin-top:8px; font-size:11px; color:#64748b;">
+          Non-exclusive license • Perpetual • Worldwide • No resale or redistribution of the raw track
         </div>
       </div>
     </div>
@@ -983,20 +991,17 @@
     }
 
     // ==================== PAYPAL CONFIG ====================
-    // ⚠️ SECURITY WARNING: Live PayPal Client ID has been REMOVED from this repo.
+    // LIVE MODE - Real payments enabled
     //
-    // The real Live Client ID is stored locally in: PAYPAL_LIVE_CLIENT_ID.txt
+    // The PayPal Client ID below is the production key.
+    // It is visible in the browser source (required for the JavaScript SDK on a static site).
     //
-    // To restore it:
-    //   1. Open PAYPAL_LIVE_CLIENT_ID.txt (in this same folder)
-    //   2. Copy the Client ID value
-    //   3. Paste it below as PAYPAL_CLIENT_ID
-    //
-    // This file is gitignored and should never be committed.
-    //
-    // Anyone viewing the source of the live site will still see the Client ID
-    // (this is unavoidable with a pure static site + client-side PayPal SDK).
-    const PAYPAL_CLIENT_ID = 'YOUR_LIVE_PAYPAL_CLIENT_ID_HERE';
+    // IMPORTANT:
+    // - Restrict this app in your PayPal Developer Dashboard to only your Vercel domains
+    //   (https://aether-music-gamma.vercel.app and any custom domains).
+    // - Do not use this key for other projects.
+    // - Consider moving order creation to a backend in the future for extra security.
+    const PAYPAL_CLIENT_ID = 'Ac713iP1PElCe_ZNUfNt_bum69VRfXWATIYRs7tv4V2vcPtGXuLaZAHi6M-hmJrRGE-DPz1syDIpYJNR';
     let paypalLoaded = false;
     let selectedLicense = null;   // { tier, price, name, track }
 
@@ -1311,21 +1316,21 @@
         name: 'Personal License',
         price: 0.99,
         description: 'Personal projects, YouTube (monetized OK), social media, podcasts',
-        features: 'Non-commercial + small monetized use'
+        features: 'Non-exclusive • Worldwide • Perpetual • No resale of the track itself'
       },
       {
         id: 'commercial',
         name: 'Commercial License',
         price: 4.99,
         description: 'Business use, client projects, apps, websites, ads under $10k budget',
-        features: 'Full commercial rights + client work'
+        features: 'Non-exclusive • Worldwide • Perpetual • Client work allowed • No resale'
       },
       {
         id: 'broadcast',
         name: 'Broadcast & Sync License',
         price: 19.99,
         description: 'TV, film, radio, large advertising campaigns, sync placements',
-        features: 'Unlimited distribution + sync rights'
+        features: 'Non-exclusive • Worldwide • Perpetual • Sync & broadcast rights • No resale'
       }
     ];
 
@@ -1481,6 +1486,10 @@
         </div>
         <div style="margin-top:8px; font-size:12px; color:#94a3b8;">
           ${license.description}
+        </div>
+        <div style="margin-top:10px; padding-top:10px; border-top:1px solid #1f2937; font-size:11px; color:#64748b;">
+          <strong>License granted:</strong> Non-exclusive • Perpetual • Worldwide<br>
+          You may use the track as described in the tier above. Resale or redistribution of the raw audio file is not permitted.
         </div>
         <div style="font-size:11px; color:#64748b; margin-top:12px;">
           PayPal Transaction: ${paypalDetails.id || 'Completed'}

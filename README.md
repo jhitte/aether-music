@@ -200,19 +200,18 @@ The site now has a fully working licensing + PayPal flow.
 - Consider adding a proper license PDF later for higher-tier purchases
 
 ### Security Warning (Client ID Exposure)
-The real **Live PayPal Client ID** has been **removed** from the repository for safety.
+This is a **static site**, so the PayPal Client ID must be in the frontend code for the JavaScript SDK to work. It will be visible if someone inspects the page source.
 
-- The real value is stored locally in the file `PAYPAL_LIVE_CLIENT_ID.txt` (this file is gitignored).
-- To restore it, copy the ID from that file and paste it into `index.html` as `PAYPAL_CLIENT_ID`.
+The production Client ID is currently active in `index.html`.
 
-Because this is a **static site**, once restored the Client ID will still be visible to anyone who views the source of the live site (this is unavoidable with a pure client-side PayPal JavaScript SDK integration).
+**Before selling:**
+- Log into the [PayPal Developer Dashboard](https://developer.paypal.com) and restrict your app to only your live domains (e.g. your Vercel URL).
+- Test the full purchase flow with a small amount if possible.
 
-**Recommended actions:**
-1. Restrict the app in your PayPal Developer Dashboard to only your Vercel domains when possible.
-2. Never commit the real Client ID.
-3. Consider moving order creation to a serverless function in the future for better security.
+**Recommended for the future:**
+- Move order creation/capture to a small serverless function (Vercel Edge / API route) so the secret never touches the browser.
 
-The code contains clear instructions on how to restore the key.
+All payments go directly to your PayPal account. The site provides an instant MP3 download upon successful payment.
 
 ---
 
