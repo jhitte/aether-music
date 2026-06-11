@@ -200,18 +200,20 @@ The site now has a fully working licensing + PayPal flow.
 - Consider adding a proper license PDF later for higher-tier purchases
 
 ### Security Warning (Client ID Exposure)
-This is a **static site**, so the PayPal Client ID must be in the frontend code for the JavaScript SDK to work. It will be visible if someone inspects the page source.
+The site now uses **server-side PayPal order creation and capture** via Vercel Functions (`/api/create-order` and `/api/capture-order`).
 
-The production Client ID is currently active in `index.html`.
+- The PayPal **Client Secret** is stored only in Vercel Environment Variables — it is never sent to the browser.
+- Order creation and payment verification happen on your server before the MP3 download is enabled.
+- The public Client ID is served dynamically from `/api/config`.
 
-**Before selling:**
-- Log into the [PayPal Developer Dashboard](https://developer.paypal.com) and restrict your app to only your live domains (e.g. your Vercel URL).
-- Test the full purchase flow with a small amount if possible.
+**To deploy / go live:**
+1. In Vercel Dashboard → Project → Settings → Environment Variables, add:
+   - `PAYPAL_CLIENT_ID` (your public ID)
+   - `PAYPAL_CLIENT_SECRET` (from PayPal Developer Dashboard for this app — keep this secret!)
+2. (Strongly recommended) In PayPal Developer Dashboard, restrict the app to only your production domain(s).
+3. Push or redeploy.
 
-**Recommended for the future:**
-- Move order creation/capture to a small serverless function (Vercel Edge / API route) so the secret never touches the browser.
-
-All payments go directly to your PayPal account. The site provides an instant MP3 download upon successful payment.
+All payments go directly to your PayPal account. The site provides an instant MP3 download only after the server confirms a successful capture. Licenses are non-exclusive, worldwide, and perpetual. Raw file resale is not allowed (terms shown during checkout).
 
 ---
 

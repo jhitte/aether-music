@@ -990,18 +990,9 @@
       }
     }
 
-    // ==================== PAYPAL CONFIG ====================
-    // LIVE MODE - Real payments enabled
-    //
-    // The PayPal Client ID below is the production key.
-    // It is visible in the browser source (required for the JavaScript SDK on a static site).
-    //
-    // IMPORTANT:
-    // - Restrict this app in your PayPal Developer Dashboard to only your Vercel domains
-    //   (https://aether-music-gamma.vercel.app and any custom domains).
-    // - Do not use this key for other projects.
-    // - Consider moving order creation to a backend in the future for extra security.
-    const PAYPAL_CLIENT_ID = 'Ac713iP1PElCe_ZNUfNt_bum69VRfXWATIYRs7tv4V2vcPtGXuLaZAHi6M-hmJrRGE-DPz1syDIpYJNR';
+    // PayPal integration is now server-side for security.
+    // Client ID is served from /api/config (from Vercel env var).
+    // Client Secret lives only on the server.
     let paypalLoaded = false;
     let selectedLicense = null;   // { tier, price, name, track }
 
@@ -1400,35 +1391,46 @@
       renderPayPalButton();
     }
 
-    function renderPayPalButton() {
+    async function renderPayPalButton() {
       const container = document.getElementById('paypal-container');
       container.innerHTML = '<div style="text-align:center; color:#64748b; font-size:12px; padding:8px;">Loading PayPal...</div>';
 
-      // Load PayPal SDK if not already loaded
-      if (!paypalLoaded && !PAYPAL_CLIENT_ID.includes('YOUR_PAYPAL_CLIENT_ID')) {
-        const script = document.createElement('script');
-        script.src = `https://www.paypal.com/sdk/js?client-id=${PAYPAL_CLIENT_ID}&currency=USD`;
-        script.onload = () => {
-          paypalLoaded = true;
-          createPayPalButton(container);
-        };
-        script.onerror = () => {
-          container.innerHTML = '<div style="color:#f87171; font-size:13px;">Failed to load PayPal. Check your Client ID.</div>';
-        };
-        document.body.appendChild(script);
-      } else if (paypalLoaded) {
-        createPayPalButton(container);
-      } else {
+      try {
+        // Fetch Client ID from server (keeps it out of the initial HTML source)
+        const configRes = await fetch('/api/config');
+        if (!configRes.ok) throw new Error('Failed to load PayPal config');
+        const { clientId } = await configRes.json();
+
+        if (!clientId) {
+          throw new Error('PayPal not configured');
+        }
+
+        if (!paypalLoaded) {
+          const script = document.createElement('script');
+          script.src = `https://www.paypal.com/sdk/js?client-id=${clientId}&currency=USD`;
+          script.onload = () => {
+            paypalLoaded = true;
+            createPayPalButton(container, clientId);
+          };
+          script.onerror = () => {
+            container.innerHTML = '<div style="color:#f87171; font-size:13px;">Failed to load PayPal. Please refresh.</div>';
+          };
+          document.body.appendChild(script);
+        } else {
+          createPayPalButton(container, clientId);
+        }
+      } catch (err) {
+        console.error(err);
         container.innerHTML = `
           <div style="background:#1e2937; border:1px solid #334155; padding:14px; border-radius:10px; font-size:13px;">
-            <strong>PayPal not configured yet.</strong><br>
-            Add your PayPal Client ID in the code to enable payments.
+            <strong>PayPal checkout is temporarily unavailable.</strong><br>
+            Please try again in a moment or contact us via PayPal.
           </div>
         `;
       }
     }
 
-    function createPayPalButton(container) {
+    function createPayPalButton(container, clientId) {
       container.innerHTML = '';
 
       if (!window.paypal) {
@@ -1443,23 +1445,43 @@
           shape: 'rect',
           label: 'pay'
         },
-        createOrder: (data, actions) => {
-          return actions.order.create({
-            purchase_units: [{
+        createOrder: async () => {
+          // Call our server to create the order (uses secret on server)
+          const res = await fetch('/api/create-order', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              amount: selectedLicense.price.toFixed(2),
               description: `Aether Music — ${selectedLicense.track.title} (${selectedLicense.name})`,
-              amount: {
-                currency_code: "USD",
-                value: selectedLicense.price.toFixed(2)
-              }
-            }]
+              trackTitle: selectedLicense.track.title
+            })
           });
+
+          const data = await res.json();
+          if (!res.ok || !data.id) {
+            throw new Error('Failed to create order');
+          }
+          return data.id;
         },
-        onApprove: (data, actions) => {
-          return actions.order.capture().then((details) => {
-            // Payment successful!
-            hideDownloadModal();
-            showPurchaseSuccess(details);
+        onApprove: async (data) => {
+          // Call our server to capture the order (verifies payment server-side)
+          const captureRes = await fetch('/api/capture-order', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ orderID: data.orderID })
           });
+
+          const captureData = await captureRes.json();
+
+          if (!captureRes.ok || !captureData.success) {
+            console.error('Capture failed:', captureData);
+            alert('There was a problem confirming your payment. Please contact us.');
+            return;
+          }
+
+          // Payment verified by our server!
+          hideDownloadModal();
+          showPurchaseSuccess({ id: captureData.transactionId || data.orderID });
         },
         onError: (err) => {
           console.error('PayPal error:', err);

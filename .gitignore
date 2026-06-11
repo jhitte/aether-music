@@ -17,3 +17,4 @@ Thumbs.db
 PAYPAL_LIVE_CLIENT_ID.txt
 .env*
 *.secret
+!.env.example
