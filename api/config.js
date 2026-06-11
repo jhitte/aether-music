@@ -1,6 +1,6 @@
 // Returns the public PayPal Client ID from environment variables.
 // This way it's not hardcoded in the HTML source.
-export default function handler(req, res) {
+module.exports = function handler(req, res) {
   // Handle CORS preflight
   if (req.method === 'OPTIONS') {
     res.setHeader('Access-Control-Allow-Origin', '*');
