@@ -1452,7 +1452,8 @@
 
             if (!res.ok || !data.id) {
               console.error('Create order API error:', data);
-              alert('Failed to create PayPal order: ' + (data.error || 'Server error. Check console.'));
+              const msg = data.details ? `${data.error} - ${data.details}` : (data.error || 'Server error. Check console.');
+              alert('Failed to create PayPal order: ' + msg);
               throw new Error('Failed to create order: ' + (data.error || 'unknown'));
             }
             return data.id;

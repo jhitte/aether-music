@@ -80,6 +80,10 @@ module.exports = async function handler(req, res) {
     });
   } catch (error) {
     console.error('Capture order error:', error);
-    res.status(500).json({ error: 'Internal server error during capture' });
+    res.status(500).json({ 
+      error: 'Internal server error during capture', 
+      details: error.message,
+      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+    });
   }
 }

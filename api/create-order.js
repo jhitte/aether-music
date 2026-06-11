@@ -91,6 +91,10 @@ module.exports = async function handler(req, res) {
     res.status(200).json({ id: order.id });
   } catch (error) {
     console.error('Create order error:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    res.status(500).json({ 
+      error: 'Internal server error', 
+      details: error.message,
+      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+    });
   }
 }
