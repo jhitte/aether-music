@@ -1508,7 +1508,10 @@
         },
         onError: (err) => {
           console.error('PayPal error:', err);
-          const msg = (err && (err.message || err.toString())) || 'Please try again.';
+          let msg = (err && (err.message || err.toString())) || 'Please try again.';
+          if (msg.toLowerCase().includes('associated with the merchant') || msg.toLowerCase().includes('same account') || msg.toLowerCase().includes('merchant you')) {
+            msg = 'PayPal blocked the purchase: you are logged into the same account as the seller (Aether). Use the "Log in to a different account" link in the PayPal window, or log out completely and sign in with a different PayPal account to test a purchase.';
+          }
           showToast('There was a problem with the PayPal payment: ' + msg);
         }
       }).render(container);
