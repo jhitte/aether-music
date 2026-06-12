@@ -1462,6 +1462,15 @@
               } else if (data.error && data.error.toLowerCase().includes('failed to create')) {
                 userMsg = data.error + (data.details ? ' — ' + JSON.stringify(data.details).slice(0,120) : '');
               }
+              // Extra visibility: also fetch what /api/config sees right now (public ID only)
+              try {
+                const cfg = await fetch('/api/config').then(r => r.json()).catch(() => ({}));
+                if (cfg && cfg.clientId) {
+                  userMsg += ' | /api/config sees ClientID prefix: ' + cfg.clientId.substring(0,10) + '...';
+                } else {
+                  userMsg += ' | /api/config returned no clientId (env not set).';
+                }
+              } catch(e) {}
               showToast('Payment setup failed: ' + userMsg);
               console.error('Full create-order response:', data);
               throw new Error('Failed to create order: ' + userMsg);
