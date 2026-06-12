@@ -1,14 +1,17 @@
 // Server-side PayPal order capture + verification
 // After successful capture, frontend can safely allow download
 
-const PAYPAL_API = 'https://api-m.paypal.com';
+const PAYPAL_MODE = (process.env.PAYPAL_MODE || 'live').toLowerCase().trim();
+const PAYPAL_API = PAYPAL_MODE === 'sandbox'
+  ? 'https://api-m.sandbox.paypal.com'
+  : 'https://api-m.paypal.com';
 
 async function getAccessToken() {
   const clientId = process.env.PAYPAL_CLIENT_ID;
   const clientSecret = process.env.PAYPAL_CLIENT_SECRET;
 
   if (!clientId || !clientSecret) {
-    throw new Error('PayPal credentials not configured');
+    throw new Error('PayPal credentials not configured. Set PAYPAL_CLIENT_ID and PAYPAL_CLIENT_SECRET in Vercel (and matching PAYPAL_MODE).');
   }
 
   const auth = Buffer.from(`${clientId}:${clientSecret}`).toString('base64');
@@ -24,9 +27,28 @@ async function getAccessToken() {
 
   const data = await response.json();
   if (!response.ok) {
-    throw new Error(data.error_description || 'Failed to get PayPal access token');
+    const envHint = PAYPAL_MODE === 'sandbox' ? ' (sandbox)' : ' (live)';
+    throw new Error((data.error_description || 'Failed to get PayPal access token') + envHint);
   }
   return data.access_token;
+}
+
+async function parseJsonBody(req) {
+  if (req.body && typeof req.body === 'object' && !Buffer.isBuffer(req.body)) {
+    return req.body;
+  }
+  try {
+    const chunks = [];
+    for await (const chunk of req) {
+      chunks.push(chunk);
+    }
+    const raw = Buffer.concat(chunks).toString('utf8').trim();
+    if (!raw) return {};
+    return JSON.parse(raw);
+  } catch (e) {
+    console.error('Failed to parse request body:', e);
+    return {};
+  }
 }
 
 module.exports = async function handler(req, res) {
@@ -47,7 +69,8 @@ module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
   try {
-    const { orderID } = req.body || {};
+    const body = await parseJsonBody(req);
+    const orderID = body.orderID;
 
     if (!orderID) {
       return res.status(400).json({ error: 'Missing orderID' });

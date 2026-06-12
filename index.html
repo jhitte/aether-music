@@ -1453,14 +1453,15 @@
             if (!res.ok || !data.id) {
               console.error('Create order API error:', data);
               const msg = data.details ? `${data.error} - ${data.details}` : (data.error || 'Server error. Check console.');
-              alert('Failed to create PayPal order: ' + msg);
+              showToast('Payment setup failed: ' + msg);
               console.error('Full create-order response:', data);
-              throw new Error('Failed to create order: ' + (data.error || 'unknown'));
+              const fullErr = data.details ? `Failed to create order: ${data.error} - ${data.details}` : `Failed to create order: ${data.error || 'unknown'}`;
+              throw new Error(fullErr);
             }
             return data.id;
           } catch (err) {
             console.error('Create order fetch error:', err);
-            alert('Failed to contact payment server: ' + (err.message || 'Network error.'));
+            showToast('Failed to contact payment server: ' + (err.message || 'Network error.'));
             throw err;
           }
         },
@@ -1476,7 +1477,7 @@
 
           if (!captureRes.ok || !captureData.success) {
             console.error('Capture failed:', captureData);
-            alert('There was a problem confirming your payment. Please contact us.');
+            showToast('Payment confirmation failed. Please contact support if charged.');
             return;
           }
 
@@ -1487,7 +1488,7 @@
         onError: (err) => {
           console.error('PayPal error:', err);
           const msg = err && err.message ? err.message : 'Please try again.';
-          alert('There was a problem with the PayPal payment: ' + msg);
+          showToast('There was a problem with the PayPal payment: ' + msg);
         }
       }).render(container);
     }
