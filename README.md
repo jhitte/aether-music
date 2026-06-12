@@ -169,7 +169,7 @@ The site now has a fully working licensing + PayPal flow.
 ### How it works
 - Visitors click **"License"** on any track
 - They choose one of three professional license tiers:
-  - **Personal** — $0.99
+  - **Personal** — $1.50
   - **Commercial** — $4.99
   - **Broadcast & Sync** — $19.99
 - Real PayPal payment is processed

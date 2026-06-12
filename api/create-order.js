@@ -95,9 +95,9 @@ module.exports = async function handler(req, res) {
     const trackTitle = body.trackTitle;
 
     // Security: Only allow our known license prices (accept number or string)
-    const allowedAmounts = ['0.99', '4.99', '19.99'];
+    const allowedAmounts = ['1.50', '4.99', '19.99'];
     if (!amount || !allowedAmounts.includes(amount)) {
-      return res.status(400).json({ error: 'Invalid amount. Only $0.99, $4.99, $19.99 licenses allowed.', received: amount });
+      return res.status(400).json({ error: 'Invalid amount. Only $1.50, $4.99, $19.99 licenses allowed.', received: amount });
     }
 
     let accessToken;

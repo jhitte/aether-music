@@ -105,7 +105,7 @@ After the deployment shows "Ready":
 
 1. Open your live URL (https://aether-music-gamma.vercel.app or your custom domain).
 2. Pick any track → click **License**.
-3. Choose **Personal License ($0.99)** — lowest risk for first live test.
+3. Choose **Personal License ($1.50)** — lowest risk for first live test.
 4. Complete checkout with a real PayPal account.
 5. You should see the success modal + be able to download the MP3.
 
@@ -171,7 +171,7 @@ When done testing locally, delete or never commit .env.local.
 | Error you saw / will see                  | Most likely cause                                      | Fix |
 |-------------------------------------------|--------------------------------------------------------|-----|
 | "client authentication failed (live.)"    | Using sandbox ID/secret or wrong pair while PAYPAL_MODE=live or hitting live endpoint | Switch PayPal app to LIVE, copy the LIVE pair, set all 3 Vercel vars, redeploy |
-| "Failed to create order" + details        | Auth failed (above) or PayPal rejected the order payload (bad amount, currency, etc.) | See auth fix. Amounts are strictly validated to 0.99/4.99/19.99 |
+| "Failed to create order" + details        | Auth failed (above) or PayPal rejected the order payload (bad amount, currency, etc.) | See auth fix. Amounts are strictly validated to 1.50/4.99/19.99 |
 | "internal server error"                   | Uncaught exception in function (often the auth throw before the new explicit handling) or network to PayPal | Check Vercel Functions logs for stack + PayPal response body. Usually auth. |
 | PayPal SDK fails to load or buttons don't appear | /api/config returned no clientId (no PAYPAL_CLIENT_ID set) | Set the CLIENT_ID var + redeploy |
 | Works in sandbox, fails in live           | MODE or credentials not flipped together               | Set MODE=live + live creds at the same time |
