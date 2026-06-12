@@ -14,6 +14,8 @@ module.exports = function handler(req, res) {
   res.setHeader('Access-Control-Allow-Methods', 'GET');
 
   const clientId = (process.env.PAYPAL_CLIENT_ID || '').trim();
+  console.log(`[config] CLIENT_ID present=${!!clientId} len=${clientId.length} prefix=${clientId.substring(0,10)}...`);
+
   if (!clientId) {
     return res.status(500).json({ error: 'PayPal Client ID not configured in Vercel environment variables' });
   }

@@ -76,6 +76,15 @@ module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Methods', 'POST');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
+  // === SAFE DIAGNOSTIC LOGGING (visible in Vercel Functions tab) ===
+  // This will prove whether your LIVE credentials are actually reaching the runtime.
+  const cid = (process.env.PAYPAL_CLIENT_ID || '').trim();
+  const csec = (process.env.PAYPAL_CLIENT_SECRET || '').trim();
+  console.log(`[create-order] PAYPAL_MODE=${PAYPAL_MODE} | TARGET_API=${PAYPAL_API}`);
+  console.log(`[create-order] CLIENT_ID present=${!!cid} len=${cid.length} prefix=${cid.substring(0, 10)}...`);
+  console.log(`[create-order] CLIENT_SECRET present=${!!csec} len=${csec.length}`);
+  // Never log the actual secret value.
+
   try {
     const body = await parseJsonBody(req);
     const amountRaw = body.amount;
