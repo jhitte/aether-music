@@ -7,11 +7,13 @@ const PAYPAL_API = PAYPAL_MODE === 'sandbox'
   : 'https://api-m.paypal.com';
 
 async function getAccessToken() {
-  const clientId = process.env.PAYPAL_CLIENT_ID;
-  const clientSecret = process.env.PAYPAL_CLIENT_SECRET;
+  const clientId = (process.env.PAYPAL_CLIENT_ID || '').trim();
+  const clientSecret = (process.env.PAYPAL_CLIENT_SECRET || '').trim();
 
   if (!clientId || !clientSecret) {
-    throw new Error('PayPal credentials not configured. Set PAYPAL_CLIENT_ID and PAYPAL_CLIENT_SECRET in Vercel (and matching PAYPAL_MODE).');
+    const err = new Error('PayPal credentials not configured. Set PAYPAL_CLIENT_ID and PAYPAL_CLIENT_SECRET in Vercel (and matching PAYPAL_MODE=live).');
+    err.code = 'NO_CREDENTIALS';
+    throw err;
   }
 
   const auth = Buffer.from(`${clientId}:${clientSecret}`).toString('base64');
@@ -27,9 +29,12 @@ async function getAccessToken() {
 
   const data = await response.json();
   if (!response.ok) {
-    // Include environment hint for faster debugging
     const envHint = PAYPAL_MODE === 'sandbox' ? ' (sandbox)' : ' (live)';
-    throw new Error((data.error_description || 'Failed to get PayPal access token') + envHint);
+    const desc = (data && (data.error_description || data.error)) || 'Failed to get PayPal access token';
+    const err = new Error(desc + envHint);
+    err.code = (data && data.error) || 'AUTH_FAILED';
+    err.status = response.status;
+    throw err;
   }
   return data.access_token;
 }
@@ -82,10 +87,24 @@ module.exports = async function handler(req, res) {
     // Security: Only allow our known license prices (accept number or string)
     const allowedAmounts = ['0.99', '4.99', '19.99'];
     if (!amount || !allowedAmounts.includes(amount)) {
-      return res.status(400).json({ error: 'Invalid amount', received: amount });
+      return res.status(400).json({ error: 'Invalid amount. Only $0.99, $4.99, $19.99 licenses allowed.', received: amount });
     }
 
-    const accessToken = await getAccessToken();
+    let accessToken;
+    try {
+      accessToken = await getAccessToken();
+    } catch (authErr) {
+      console.error('PayPal getAccessToken failed:', authErr.message);
+      const isAuthFail = authErr.code === 'AUTH_FAILED' || /client authentication|invalid_client|authentication failed/i.test(authErr.message || '');
+      const status = isAuthFail ? 401 : 500;
+      return res.status(status).json({
+        error: isAuthFail 
+          ? 'PayPal client authentication failed (live). Verify LIVE Client ID + Secret pair in Vercel env vars and that your PayPal app is switched to LIVE mode (not Sandbox). Also confirm PAYPAL_MODE=live exactly.'
+          : 'Failed to authenticate with PayPal.',
+        hint: 'Check Vercel Project > Deployments > latest > Functions tab logs for full details. See GO-LIVE-INSTRUCTIONS.md.',
+        mode: PAYPAL_MODE
+      });
+    }
 
     const orderPayload = {
       intent: 'CAPTURE',
@@ -113,9 +132,10 @@ module.exports = async function handler(req, res) {
 
     if (!response.ok) {
       console.error('PayPal order creation failed:', order);
-      return res.status(500).json({ 
+      // Surface useful info but do not leak internal secrets
+      return res.status(400).json({ 
         error: 'Failed to create PayPal order', 
-        details: order   // forwards the actual error from PayPal for debugging
+        details: order && (order.message || order.name || order.error_description || order) 
       });
     }
 
@@ -123,9 +143,10 @@ module.exports = async function handler(req, res) {
     res.status(200).json({ id: order.id });
   } catch (error) {
     console.error('Create order error:', error);
+    // Never leak stack traces or raw secrets to client
     res.status(500).json({ 
-      error: 'Internal server error', 
-      details: error.message || String(error)
+      error: 'Internal server error creating order. Check Vercel function logs.',
+      hint: error && error.code ? error.code : undefined
     });
   }
 }

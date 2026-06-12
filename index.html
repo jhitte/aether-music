@@ -1409,7 +1409,7 @@
         container.innerHTML = `
           <div style="background:#1e2937; border:1px solid #334155; padding:14px; border-radius:10px; font-size:13px;">
             <strong>PayPal checkout is temporarily unavailable.</strong><br>
-            Please try again in a moment or contact us via PayPal.
+            This is often caused by missing/incorrect PayPal credentials in the hosting platform. Owner: check /api/config and Vercel env vars.
           </div>
         `;
       }
@@ -1452,16 +1452,27 @@
 
             if (!res.ok || !data.id) {
               console.error('Create order API error:', data);
-              const msg = data.details ? `${data.error} - ${data.details}` : (data.error || 'Server error. Check console.');
-              showToast('Payment setup failed: ' + msg);
+              let userMsg = data.error || 'Server error during order creation.';
+              // Make the exact reported errors crystal clear + actionable
+              const raw = (data.details || data.error || '').toString().toLowerCase();
+              if (raw.includes('client authentication') || raw.includes('invalid_client') || raw.includes('authentication failed')) {
+                userMsg = 'PayPal LIVE authentication failed. The Client ID/Secret in Vercel are invalid, mismatched, or still set to Sandbox values. Switch your PayPal app to LIVE, copy fresh LIVE credentials, set PAYPAL_MODE=live in Vercel (all 3 envs), then redeploy. See GO-LIVE-INSTRUCTIONS.md.';
+              } else if (raw.includes('internal server') || res.status >= 500) {
+                userMsg = 'Internal server error on payment server. Open Vercel Dashboard > your project > latest Deployment > Functions tab and check create-order logs for the exact PayPal response.';
+              } else if (data.error && data.error.toLowerCase().includes('failed to create')) {
+                userMsg = data.error + (data.details ? ' — ' + JSON.stringify(data.details).slice(0,120) : '');
+              }
+              showToast('Payment setup failed: ' + userMsg);
               console.error('Full create-order response:', data);
-              const fullErr = data.details ? `Failed to create order: ${data.error} - ${data.details}` : `Failed to create order: ${data.error || 'unknown'}`;
-              throw new Error(fullErr);
+              throw new Error('Failed to create order: ' + userMsg);
             }
             return data.id;
           } catch (err) {
             console.error('Create order fetch error:', err);
-            showToast('Failed to contact payment server: ' + (err.message || 'Network error.'));
+            // Already showed a good toast above in most cases; this is the network/throw path
+            if (!/failed to create order/i.test(err.message || '')) {
+              showToast('Failed to contact payment server: ' + (err.message || 'Network error. Check your connection and try again.'));
+            }
             throw err;
           }
         },
@@ -1477,7 +1488,8 @@
 
           if (!captureRes.ok || !captureData.success) {
             console.error('Capture failed:', captureData);
-            showToast('Payment confirmation failed. Please contact support if charged.');
+            const capErr = captureData && (captureData.error || captureData.details || 'unknown');
+            showToast('Payment confirmation failed on server. If you were charged, contact support with your PayPal transaction ID. Details: ' + capErr);
             return;
           }
 
@@ -1487,7 +1499,7 @@
         },
         onError: (err) => {
           console.error('PayPal error:', err);
-          const msg = err && err.message ? err.message : 'Please try again.';
+          const msg = (err && (err.message || err.toString())) || 'Please try again.';
           showToast('There was a problem with the PayPal payment: ' + msg);
         }
       }).render(container);

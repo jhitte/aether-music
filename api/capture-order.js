@@ -7,11 +7,13 @@ const PAYPAL_API = PAYPAL_MODE === 'sandbox'
   : 'https://api-m.paypal.com';
 
 async function getAccessToken() {
-  const clientId = process.env.PAYPAL_CLIENT_ID;
-  const clientSecret = process.env.PAYPAL_CLIENT_SECRET;
+  const clientId = (process.env.PAYPAL_CLIENT_ID || '').trim();
+  const clientSecret = (process.env.PAYPAL_CLIENT_SECRET || '').trim();
 
   if (!clientId || !clientSecret) {
-    throw new Error('PayPal credentials not configured. Set PAYPAL_CLIENT_ID and PAYPAL_CLIENT_SECRET in Vercel (and matching PAYPAL_MODE).');
+    const err = new Error('PayPal credentials not configured. Set PAYPAL_CLIENT_ID and PAYPAL_CLIENT_SECRET in Vercel (and matching PAYPAL_MODE).');
+    err.code = 'NO_CREDENTIALS';
+    throw err;
   }
 
   const auth = Buffer.from(`${clientId}:${clientSecret}`).toString('base64');
@@ -28,7 +30,11 @@ async function getAccessToken() {
   const data = await response.json();
   if (!response.ok) {
     const envHint = PAYPAL_MODE === 'sandbox' ? ' (sandbox)' : ' (live)';
-    throw new Error((data.error_description || 'Failed to get PayPal access token') + envHint);
+    const desc = (data && (data.error_description || data.error)) || 'Failed to get PayPal access token';
+    const err = new Error(desc + envHint);
+    err.code = (data && data.error) || 'AUTH_FAILED';
+    err.status = response.status;
+    throw err;
   }
   return data.access_token;
 }
@@ -76,7 +82,20 @@ module.exports = async function handler(req, res) {
       return res.status(400).json({ error: 'Missing orderID' });
     }
 
-    const accessToken = await getAccessToken();
+    let accessToken;
+    try {
+      accessToken = await getAccessToken();
+    } catch (authErr) {
+      console.error('PayPal getAccessToken (capture) failed:', authErr.message);
+      const isAuthFail = authErr.code === 'AUTH_FAILED' || /client authentication|invalid_client|authentication failed/i.test(authErr.message || '');
+      const status = isAuthFail ? 401 : 500;
+      return res.status(status).json({
+        error: isAuthFail 
+          ? 'PayPal client authentication failed during capture (live). Check LIVE credentials and PAYPAL_MODE=live in Vercel.'
+          : 'Failed to authenticate with PayPal for capture.',
+        hint: 'See Vercel function logs and GO-LIVE-INSTRUCTIONS.md'
+      });
+    }
 
     const response = await fetch(`${PAYPAL_API}/v2/checkout/orders/${orderID}/capture`, {
       method: 'POST',
@@ -90,7 +109,10 @@ module.exports = async function handler(req, res) {
 
     if (!response.ok || captureData.status !== 'COMPLETED') {
       console.error('PayPal capture failed:', captureData);
-      return res.status(400).json({ error: 'Payment capture failed', details: captureData });
+      return res.status(400).json({ 
+        error: 'Payment capture failed', 
+        details: captureData && (captureData.message || captureData.name || captureData.status || 'See logs') 
+      });
     }
 
     // Payment verified on server!
@@ -104,8 +126,7 @@ module.exports = async function handler(req, res) {
   } catch (error) {
     console.error('Capture order error:', error);
     res.status(500).json({ 
-      error: 'Internal server error during capture', 
-      details: error.message || String(error)
+      error: 'Internal server error during capture. Check Vercel function logs.',
     });
   }
 }

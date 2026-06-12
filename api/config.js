@@ -1,5 +1,5 @@
 // Returns the public PayPal Client ID from environment variables.
-// This way it's not hardcoded in the HTML source.
+// This way it's not hardcoded in the HTML source. Never expose secret here.
 module.exports = function handler(req, res) {
   // Handle CORS preflight
   if (req.method === 'OPTIONS') {
@@ -9,13 +9,13 @@ module.exports = function handler(req, res) {
     return res.status(200).end();
   }
 
-  // CORS for safety (restrict in prod if needed)
+  // CORS (consider locking to your domain in prod for extra hardening)
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET');
 
-  const clientId = process.env.PAYPAL_CLIENT_ID;
+  const clientId = (process.env.PAYPAL_CLIENT_ID || '').trim();
   if (!clientId) {
-    return res.status(500).json({ error: 'PayPal Client ID not configured' });
+    return res.status(500).json({ error: 'PayPal Client ID not configured in Vercel environment variables' });
   }
 
   res.status(200).json({ clientId });
